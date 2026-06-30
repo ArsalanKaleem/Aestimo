@@ -1,0 +1,22 @@
+{
+  "_comment": "Sample resume payload that mirrors what the mock repositories return. Not loaded at runtime in mock mode, but keeps the declared assets/mock/ directory valid and documents the expected backend shape.",
+  "name": "Alex Morgan",
+  "title": "Senior Software Engineer",
+  "yearsExperience": 6,
+  "skills": {
+    "technical": ["Python", "Go", "TypeScript", "AWS", "Terraform", "Docker", "PostgreSQL", "Redis"],
+    "soft": ["Technical Leadership", "Mentorship", "Communication"]
+  },
+  "experience": [
+    {
+      "company": "Acme",
+      "role": "Senior Software Engineer",
+      "highlight": "Led a payments platform handling 3M+ requests/day; reduced p99 latency by 45%."
+    },
+    {
+      "company": "Northwind",
+      "role": "Tech Lead",
+      "highlight": "Mentored 5 engineers; cut cloud spend 30% via right-sizing and spot instances."
+    }
+  ]
+}

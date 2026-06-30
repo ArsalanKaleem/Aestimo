@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "271323359015",
+    "project_id": "careergpt-abbasi",
+    "storage_bucket": "careergpt-abbasi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271323359015:android:62c8b678b6a1b44e052b02",
+        "android_client_info": {
+          "package_name": "com.example.careergpt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7Z5HhnzdG6Xolf7wBnY75a82nS2wH8co"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
