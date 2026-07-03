@@ -37,40 +37,102 @@ Aestimo reads your resume once and powers every feature from it. There's no manu
 
 ## 📸 Screenshots
 
-> Add your images to a `screenshots/` folder in the project root using the filenames below.
+> Add your images to a `screenshots/` folder in the project root.
+
+---
 
 ### Login
-![Login](screenshots/login.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/login.png" alt="Login Desktop" width="400"> | <img src="screenshots/loginm.png" alt="Login Mobile" width="220"> |
+
+---
 
 ### Dashboard
-![Dashboard](screenshots/dashboard.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/dashboard.png" alt="Dashboard Desktop" width="400"> | <img src="screenshots/dashboardm.png" alt="Dashboard Mobile" width="220"> |
+
+---
 
 ### Upload Resume
-![Upload Resume](screenshots/upload.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/upload.png" alt="Upload Resume Desktop" width="400"> | <img src="screenshots/uploadm.png" alt="Upload Resume Mobile" width="220"> |
+
+---
 
 ### Resume Insights
-![Resume Insights](screenshots/insights.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/insights.png" alt="Resume Insights Desktop" width="400"> | <img src="screenshots/insightsm.png" alt="Resume Insights Mobile" width="220"> |
+
+---
 
 ### Resume Score
-![Resume Score](screenshots/resume_score.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/resume_score.png" alt="Resume Score Desktop" width="400"> | <img src="screenshots/resume_scorem.png" alt="Resume Score Mobile" width="220"> |
+
+---
 
 ### ATS Resume
-![ATS Resume](screenshots/ats_resume.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/ats_resume.png" alt="ATS Resume Desktop" width="400"> | <img src="screenshots/ats_resumem.png" alt="ATS Resume Mobile" width="220"> |
+
+---
 
 ### AI Chat
-![AI Chat](screenshots/chat.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/chat.png" alt="AI Chat Desktop" width="400"> | <img src="screenshots/chatm.png" alt="AI Chat Mobile" width="220"> |
+
+---
 
 ### Interview Prep
-![Interview Prep](screenshots/interview.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/interview.png" alt="Interview Prep Desktop" width="400"> | <img src="screenshots/interviewm.png" alt="Interview Prep Mobile" width="220"> |
+
+---
 
 ### Job Match
-![Job Match](screenshots/jobs.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/jobs.png" alt="Job Match Desktop" width="400"> | <img src="screenshots/jobsm.png" alt="Job Match Mobile" width="220"> |
+
+---
 
 ### Cover Letter
-![Cover Letter](screenshots/cover_letter.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/cover_letter.png" alt="Cover Letter Desktop" width="400"> | <img src="screenshots/cover_letterm.png" alt="Cover Letter Mobile" width="220"> |
+
+---
 
 ### About
-![About](screenshots/about.png)
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/about.png" alt="About Desktop" width="400"> | <img src="screenshots/aboutm.png" alt="About Mobile" width="220"> |
+---
+
+### Settings
+
+| Desktop | Mobile |
+|----------|---------|
+| <img src="screenshots/settings.png" alt="About Desktop" width="400"> | <img src="screenshots/settingsm.png" alt="About Mobile" width="220"> |
 
 ## 🛠️ Tech Stack
 
