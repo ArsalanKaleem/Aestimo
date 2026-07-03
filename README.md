@@ -37,7 +37,6 @@ Aestimo reads your resume once and powers every feature from it. There's no manu
 
 ## 📸 Screenshots
 
-> Add your images to a `screenshots/` folder in the project root.
 
 ---
 
