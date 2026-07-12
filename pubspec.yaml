@@ -40,6 +40,7 @@ dependencies:
   firebase_auth: ^6.5.2
   url_launcher: ^6.3.2
   path_provider: ^2.1.2
+  flutter_launcher_icons: ^0.14.3
 
   # ----------------------------------------------------------------------
   # Enable these when wiring the real backend (see README "Going to prod").
@@ -59,3 +60,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/mock/
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/aestimo.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/aestimo.png"
