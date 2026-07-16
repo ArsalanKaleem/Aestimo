@@ -1,7 +1,16 @@
 {
   "projects": {
-    "Aestimo": "careergpt-abbasi"
+    "Aestimo": "careergpt-abbasi",
+    "aestimo-career-copilot": "careergpt-abbasi"
   },
-  "targets": {},
+  "targets": {
+    "careergpt-abbasi": {
+      "hosting": {
+        "aestimo": [
+          "aestimo-career-copilot"
+        ]
+      }
+    }
+  },
   "etags": {}
 }
