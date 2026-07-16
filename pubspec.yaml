@@ -61,8 +61,11 @@ flutter:
   assets:
     - assets/mock/
 flutter_launcher_icons:
-  android: true
-  ios: false
-  image_path: "assets/icons/aestimo.png"
-  adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/icons/aestimo.png"
+    image_path: "assets/icon/icon.png"
+    android: "launcher_icon"
+    adaptive_icon_background: "#FFFFFF"
+    adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+    windows:
+      generate: true
+      image_path: "assets/icon/icon.png"
+      icon_size: 256
