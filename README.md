@@ -10,17 +10,40 @@ An AI-powered career assistant built with Flutter. Upload your resume and Aestim
 ![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Hosting-FFCA28?logo=firebase&logoColor=black)
 ![Gemini](https://img.shields.io/badge/Google-Gemini-8E75B2?logo=googlegemini&logoColor=white)
+![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20Windows%20%7C%20Web-2563EB)
 ![License](https://img.shields.io/badge/License-MIT-3da639)
 
-[Live Demo](https://careergpt-abbasi.web.app) · [Report a Bug](https://github.com/ArsalanKaleem/Aestimo/issues) · [Request a Feature](https://github.com/ArsalanKaleem/Aestimo/issues)
+[Live Demo](https://aestimo-career-copilot.web.app) · [Download (Windows / Android)](https://github.com/ArsalanKaleem/Aestimo/releases) · [Report a Bug](https://github.com/ArsalanKaleem/Aestimo/issues) · [Request a Feature](https://github.com/ArsalanKaleem/Aestimo/issues)
 
 </div>
 
 ---
 
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Download](#-download)
+- [Screenshots](#-screenshots)
+- [Tech Stack](#️-tech-stack)
+- [Architecture](#-architecture)
+- [Getting Started](#-getting-started)
+- [Configuration](#-configuration)
+- [Deployment](#️-deploy-firebase-hosting)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
+- [Author](#-author)
+- [License](#-license)
+
+---
+
 ## ✨ Overview
 
-Aestimo reads your resume once and powers every feature from it. There's no manual data entry — upload a PDF, and the app extracts, understands, and uses your experience to help you land your next role. It runs on Android, Web, and Windows from a single Flutter codebase.
+Aestimo reads your resume once and powers every feature from it. There's no manual data entry — upload a PDF, and the app extracts, understands, and uses your experience to help you land your next role.
+
+Every answer, score, and suggestion is grounded in the resume you actually uploaded rather than generic advice, so the output stays specific to your background instead of reading like a template. It runs on **Android, Web, and Windows** from a single Flutter codebase, with Firebase handling authentication and hosting, and Google Gemini powering the AI layer end to end — extraction, scoring, chat, and generation.
+
+Try it instantly in the browser at the live demo link above, or grab a native build from [Releases](https://github.com/ArsalanKaleem/Aestimo/releases) if you'd rather install it on Windows or Android.
 
 ## 🚀 Features
 
@@ -35,10 +58,21 @@ Aestimo reads your resume once and powers every feature from it. There's no manu
 - **Secure Auth** — email/password sign-in via Firebase Authentication.
 - **Adaptive UI** — a navigation rail on desktop/tablet and a slide-out drawer on mobile.
 
+## 📥 Download
+
+Aestimo runs anywhere without installing anything via the [live web app](https://aestimo-career-copilot.web.app), or you can install a native build:
+
+| Platform | How to get it |
+|---|---|
+| 🌐 **Web** | Open [aestimo-career-copilot.web.app](https://aestimo-career-copilot.web.app) — nothing to install |
+| 🪟 **Windows** | Download the latest installer `.exe` from [**Releases**](https://github.com/ArsalanKaleem/Aestimo/releases) and run it |
+| 🤖 **Android** | Download the latest `.apk` from [**Releases**](https://github.com/ArsalanKaleem/Aestimo/releases) and install it |
+
+> Windows Setup and the Android APK aren't code-signed yet, so you may see a SmartScreen or "unknown sources" prompt on first install — this is expected for a self-distributed build. Choose **More info → Run anyway** on Windows, or allow installs from your browser/file manager on Android.
+
+Check the [Releases page](https://github.com/ArsalanKaleem/Aestimo/releases) for release notes, version history, and checksums on each build.
+
 ## 📸 Screenshots
-
-
----
 
 ### Login
 
@@ -125,13 +159,14 @@ Aestimo reads your resume once and powers every feature from it. There's no manu
 | Desktop | Mobile |
 |----------|---------|
 | <img src="screenshots/about.png" alt="About Desktop" width="400"> | <img src="screenshots/aboutm.png" alt="About Mobile" width="220"> |
+
 ---
 
 ### Settings
 
 | Desktop | Mobile |
 |----------|---------|
-| <img src="screenshots/settings.png" alt="About Desktop" width="400"> | <img src="screenshots/settingsm.png" alt="About Mobile" width="220"> |
+| <img src="screenshots/settings.png" alt="Settings Desktop" width="400"> | <img src="screenshots/settingsm.png" alt="Settings Mobile" width="220"> |
 
 ## 🛠️ Tech Stack
 
@@ -142,12 +177,13 @@ Aestimo reads your resume once and powers every feature from it. There's no manu
 | **Routing** | GoRouter |
 | **AI** | Google Gemini (Generative Language API) |
 | **Auth** | Firebase Authentication |
+| **Hosting** | Firebase Hosting |
 | **Networking** | Dio |
 | **Other** | file_picker, url_launcher, flutter_markdown_plus |
 
 ## 🏗️ Architecture
 
-Feature-first clean architecture. Each feature owns its `models / data / providers / presentation` layers.
+Feature-first clean architecture. Each feature owns its `models / data / providers / presentation` layers, so functionality stays isolated and easy to extend without touching unrelated parts of the app.
 
 ```
 lib/
@@ -158,6 +194,8 @@ lib/
 ├── shared/widgets/  # reusable UI (cards, buttons, shell, drawer, ...)
 └── main.dart
 ```
+
+State is managed with Riverpod providers scoped per feature, navigation runs through GoRouter with a shared responsive shell, and all AI calls flow through a single Gemini client in `core/gemini` so prompting, error handling, and retries live in one place instead of being duplicated across features.
 
 ## 🏁 Getting Started
 
@@ -205,7 +243,29 @@ flutter build web --release --dart-define=GEMINI_API_KEY=your_key
 firebase deploy --only hosting
 ```
 
-Live at **[careergpt-abbasi.web.app](https://careergpt-abbasi.web.app)**.
+Live at **[aestimo-career-copilot.web.app](https://aestimo-career-copilot.web.app)**.
+
+## 🗺️ Roadmap
+
+- [ ] Code-signed Windows and Android builds
+- [ ] iOS and macOS support
+- [ ] Team/organization accounts for career coaches and recruiters
+- [ ] Offline resume parsing fallback
+- [ ] Localized UI for non-English resumes
+
+Have an idea that isn't listed? Open a [feature request](https://github.com/ArsalanKaleem/Aestimo/issues).
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome.
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a pull request
+
+Please keep PRs focused — one feature or fix per PR makes review much faster.
 
 ## 👤 Author
 
