@@ -141,63 +141,202 @@ class _TopBar extends ConsumerWidget {
           color: AppColors.textSecondary,
         ),
         const SizedBox(width: 4),
-        PopupMenuButton<String>(
-          offset: const Offset(0, 48),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadii.md),
-          ),
-          onSelected: (v) {
-            if (v == 'signout') ref.read(authProvider.notifier).signOut();
-            if (v == 'about') context.go(AppRoutes.about);
-            if (v == 'settings') context.go(AppRoutes.settings);
-          },
-          itemBuilder: (_) => [
-            PopupMenuItem(
-              enabled: false,
-              child: Text(user?.email ?? '',
-                  style: Theme.of(context).textTheme.bodySmall),
-            ),
-            const PopupMenuDivider(),
-            const PopupMenuItem(
-              value: 'about',
-              child: Row(
-                children: [
-                  Icon(Icons.person_outline_rounded, size: 18),
-                  SizedBox(width: 10),
-                  Text('About'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'settings',
-              child: Row(
-                children: [
-                  Icon(Icons.settings_outlined, size: 18),
-                  SizedBox(width: 10),
-                  Text('Settings'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(value: 'signout', child: Text('Sign out')),
-          ],
-          child: CircleAvatar(
-            radius: 18,
-            backgroundColor: AppColors.primary,
-            foregroundImage: (user?.photoUrl != null &&
-                    (user?.photoUrl as String).trim().isNotEmpty)
-                ? NetworkImage(user!.photoUrl as String)
-                : null,
-            child: Text(
-              user?.initials ?? '?',
-              style: const TextStyle(
-                color: AppColors.secondary,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
+        _AccountMenu(user: user),
+      ],
+    );
+  }
+}
+
+/// A polished account menu: avatar trigger + a custom-styled dropdown with a
+/// profile header, a settings entry, and a destructive sign-out entry.
+class _AccountMenu extends ConsumerWidget {
+  const _AccountMenu({required this.user});
+  final dynamic user;
+
+  static const double _menuWidth = 260;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return PopupMenuButton<String>(
+      tooltip: '',
+      offset: const Offset(0, 52),
+      padding: EdgeInsets.zero,
+      position: PopupMenuPosition.under,
+      color: AppColors.surface,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      constraints: const BoxConstraints(minWidth: _menuWidth, maxWidth: _menuWidth),
+      onSelected: (v) {
+        if (v == 'signout') ref.read(authProvider.notifier).signOut();
+        if (v == 'settings') context.go(AppRoutes.settings);
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem<String>(
+          enabled: false,
+          padding: EdgeInsets.zero,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: AppColors.primarySoft,
+                  foregroundImage: (user?.photoUrl != null &&
+                          (user?.photoUrl as String).trim().isNotEmpty)
+                      ? NetworkImage(user!.photoUrl as String)
+                      : null,
+                  child: Text(
+                    user?.initials ?? '?',
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        (user?.displayName as String?)?.trim().isNotEmpty ==
+                                true
+                            ? user!.displayName as String
+                            : 'Your account',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        user?.email ?? '',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.textTertiary,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
+        const PopupMenuItem<String>(
+          enabled: false,
+          height: 1,
+          padding: EdgeInsets.zero,
+          child: Divider(height: 1, thickness: 1, color: AppColors.border),
+        ),
+        PopupMenuItem<String>(
+          value: 'settings',
+          padding: EdgeInsets.zero,
+          child: _MenuTile(
+            icon: Icons.settings_outlined,
+            iconColor: AppColors.primary,
+            iconBg: AppColors.primarySoft,
+            label: 'Settings',
+          ),
+        ),
+        const PopupMenuItem<String>(
+          enabled: false,
+          height: 9,
+          padding: EdgeInsets.zero,
+          child: SizedBox(height: 1),
+        ),
+        PopupMenuItem<String>(
+          value: 'signout',
+          padding: EdgeInsets.zero,
+          child: _MenuTile(
+            icon: Icons.logout_rounded,
+            iconColor: AppColors.danger,
+            iconBg: const Color(0xFFFEE2E2),
+            label: 'Sign out',
+            labelColor: AppColors.danger,
+          ),
+        ),
       ],
+      child: Container(
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.border),
+        ),
+        child: CircleAvatar(
+          radius: 17,
+          backgroundColor: AppColors.primary,
+          foregroundImage: (user?.photoUrl != null &&
+                  (user?.photoUrl as String).trim().isNotEmpty)
+              ? NetworkImage(user!.photoUrl as String)
+              : null,
+          child: Text(
+            user?.initials ?? '?',
+            style: const TextStyle(
+              color: AppColors.secondary,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A single row inside [_AccountMenu] with a soft icon chip and hover/press
+/// feedback via [InkWell], so the custom items still feel native.
+class _MenuTile extends StatelessWidget {
+  const _MenuTile({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+    required this.label,
+    this.labelColor,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
+  final String label;
+  final Color? labelColor;
+
+  @override
+  Widget build(BuildContext context) {
+    // PopupMenuItem already wraps its child in an InkWell that pops the
+    // menu with `value` on tap, so this widget stays purely presentational.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(AppRadii.sm),
+            ),
+            child: Icon(icon, size: 16, color: iconColor),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: TextStyle(
+              color: labelColor ?? AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
+              fontSize: 13.5,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
