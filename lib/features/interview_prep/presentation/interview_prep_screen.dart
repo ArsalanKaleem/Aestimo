@@ -45,8 +45,7 @@ class _InterviewPrepScreenState extends ConsumerState<InterviewPrepScreen>
             ? EmptyState(
                 icon: Icons.psychology_rounded,
                 title: 'Upload a resume to prep',
-                message:
-                    'Your interview questions are personalized from your '
+                message: 'Your interview questions are personalized from your '
                     'resume. Upload one to get started.',
                 actionLabel: 'Upload resume',
                 onAction: () => context.go(AppRoutes.upload),
@@ -86,9 +85,18 @@ class _Tabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final primary = theme.colorScheme.primary;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
+        color: surfaceMuted,
         borderRadius: BorderRadius.circular(AppRadii.md),
       ),
       padding: const EdgeInsets.all(4),
@@ -97,12 +105,12 @@ class _Tabs extends StatelessWidget {
         dividerColor: Colors.transparent,
         indicatorSize: TabBarIndicatorSize.tab,
         indicator: BoxDecoration(
-          color: AppColors.surface,
+          color: surface,
           borderRadius: BorderRadius.circular(AppRadii.sm),
-          boxShadow: AppShadows.card,
+          boxShadow: AppShadows.card(context),
         ),
-        labelColor: AppColors.primary,
-        unselectedLabelColor: AppColors.textSecondary,
+        labelColor: primary,
+        unselectedLabelColor: textSecondary,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         tabs: const [
           Tab(text: 'Questions'),
@@ -125,8 +133,7 @@ class _QuestionsTab extends ConsumerWidget {
     final async = ref.watch(interviewQuestionsProvider);
 
     return async.when(
-      loading: () =>
-          const LoadingView(message: 'Generating your questions…'),
+      loading: () => const LoadingView(message: 'Generating your questions…'),
       error: (err, _) => ErrorView(
         message: 'We couldn’t generate questions. Please try again.',
         onRetry: () => ref.invalidate(interviewQuestionsProvider),
@@ -162,6 +169,14 @@ class _CategoryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     final icon = switch (category) {
       QuestionCategory.technical => Icons.terminal_rounded,
       QuestionCategory.behavioral => Icons.diversity_3_rounded,
@@ -169,21 +184,20 @@ class _CategoryHeader extends StatelessWidget {
     };
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.primary),
+        Icon(icon, size: 18, color: primary),
         const SizedBox(width: AppSpacing.sm),
-        Text(category.label,
-            style: Theme.of(context).textTheme.titleMedium),
+        Text(category.label, style: theme.textTheme.titleMedium),
         const SizedBox(width: AppSpacing.sm),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: AppColors.surfaceMuted,
+            color: surfaceMuted,
             borderRadius: BorderRadius.circular(AppRadii.pill),
           ),
           child: Text(
             '$count',
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: textSecondary,
               fontWeight: FontWeight.w600,
               fontSize: 12,
             ),
@@ -207,7 +221,13 @@ class _QuestionCardState extends State<_QuestionCard> {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
@@ -227,12 +247,12 @@ class _QuestionCardState extends State<_QuestionCard> {
                         ? Icons.lightbulb_rounded
                         : Icons.lightbulb_outline_rounded,
                     size: 16,
-                    color: AppColors.primary,
+                    color: primary,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     _showTip ? 'Hide guidance' : 'How to answer',
-                    style: t.labelLarge?.copyWith(color: AppColors.primary),
+                    style: t.labelLarge?.copyWith(color: primary),
                   ),
                 ],
               ),
@@ -240,15 +260,14 @@ class _QuestionCardState extends State<_QuestionCard> {
           ),
           AnimatedCrossFade(
             duration: AppDurations.fast,
-            crossFadeState: _showTip
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
+            crossFadeState:
+                _showTip ? CrossFadeState.showFirst : CrossFadeState.showSecond,
             firstChild: Container(
               width: double.infinity,
               margin: const EdgeInsets.only(top: AppSpacing.sm),
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.primarySoft,
+                color: primarySoft,
                 borderRadius: BorderRadius.circular(AppRadii.sm),
               ),
               child: Text(widget.question.tip, style: t.bodyMedium),
@@ -350,7 +369,13 @@ class _StartPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
@@ -362,11 +387,11 @@ class _StartPanel extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
+                  color: primarySoft,
                   borderRadius: BorderRadius.circular(AppRadii.xl),
                 ),
-                child: const Icon(Icons.record_voice_over_rounded,
-                    color: AppColors.primary, size: 30),
+                child: Icon(Icons.record_voice_over_rounded,
+                    color: primary, size: 30),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text('Mock Interview', style: t.titleLarge),
@@ -399,7 +424,20 @@ class _TurnBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isInterviewer = turn.role == MockRole.interviewer;
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final onPrimary =
+        isDark ? AppColorsDark.textOnPrimary : AppColorsLight.textOnPrimary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+    final textPrimary =
+        isDark ? AppColorsDark.textPrimary : AppColorsLight.textPrimary;
 
     if (!isInterviewer) {
       return Align(
@@ -409,14 +447,14 @@ class _TurnBubble extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md, vertical: 10),
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: primary,
             borderRadius: BorderRadius.circular(AppRadii.lg).copyWith(
               bottomRight: const Radius.circular(4),
             ),
           ),
           child: Text(
             turn.content,
-            style: t.bodyLarge?.copyWith(color: AppColors.secondary),
+            style: t.bodyLarge?.copyWith(color: onPrimary),
           ),
         ),
       );
@@ -431,9 +469,7 @@ class _TurnBubble extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: turn.isFeedback
-                  ? AppColors.primarySoft
-                  : AppColors.surfaceMuted,
+              color: turn.isFeedback ? primarySoft : surfaceMuted,
               borderRadius: BorderRadius.circular(AppRadii.sm),
             ),
             child: Icon(
@@ -441,7 +477,7 @@ class _TurnBubble extends StatelessWidget {
                   ? Icons.tips_and_updates_rounded
                   : Icons.person_search_rounded,
               size: 18,
-              color: AppColors.primary,
+              color: primary,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -452,26 +488,24 @@ class _TurnBubble extends StatelessWidget {
                 Text(
                   turn.isFeedback ? 'Feedback' : 'Interviewer',
                   style: t.labelSmall?.copyWith(
-                    color: AppColors.textTertiary,
+                    color: textTertiary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 if (turn.streaming && turn.content.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6),
-                    child: Text('…',
-                        style: TextStyle(color: AppColors.textTertiary)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Text('…', style: TextStyle(color: textTertiary)),
                   )
                 else
                   MarkdownBody(
                     data: turn.content,
                     styleSheet: MarkdownStyleSheet(
-                      p: t.bodyLarge?.copyWith(color: AppColors.textPrimary),
-                      strong: t.bodyLarge
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                      listBullet:
-                          t.bodyLarge?.copyWith(color: AppColors.textPrimary),
+                      p: t.bodyLarge?.copyWith(color: textPrimary),
+                      strong:
+                          t.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+                      listBullet: t.bodyLarge?.copyWith(color: textPrimary),
                     ),
                   ),
               ],
@@ -489,15 +523,20 @@ class _FinishedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return Container(
       margin: const EdgeInsets.only(top: AppSpacing.lg),
       child: AppCard(
-        color: AppColors.primarySoft,
+        color: primarySoft,
         child: Column(
           children: [
-            const Icon(Icons.celebration_rounded,
-                color: AppColors.primary, size: 28),
+            Icon(Icons.celebration_rounded, color: primary, size: 28),
             const SizedBox(height: AppSpacing.sm),
             Text('That’s a wrap!', style: t.titleMedium),
             const SizedBox(height: 4),
@@ -537,6 +576,9 @@ class _AnswerInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+
     return Container(
       padding: const EdgeInsets.only(top: AppSpacing.sm),
       child: Row(
@@ -556,7 +598,7 @@ class _AnswerInput extends StatelessWidget {
                         ? 'Type your answer…'
                         : 'Waiting for the next question…',
                 filled: true,
-                fillColor: AppColors.surface,
+                fillColor: surface,
               ),
             ),
           ),

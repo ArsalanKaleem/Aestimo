@@ -23,7 +23,12 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 380),
@@ -36,10 +41,10 @@ class EmptyState extends StatelessWidget {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
+                  color: primarySoft,
                   borderRadius: BorderRadius.circular(AppRadii.xl),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 32),
+                child: Icon(icon, color: theme.colorScheme.primary, size: 32),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(title, style: t.titleLarge, textAlign: TextAlign.center),

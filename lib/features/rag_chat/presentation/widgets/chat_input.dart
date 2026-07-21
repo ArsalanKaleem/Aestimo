@@ -49,21 +49,26 @@ class _ChatInputState extends State<ChatInput> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        border: Border(top: BorderSide(color: border)),
       ),
       child: SafeArea(
         top: false,
         child: Container(
           padding: const EdgeInsets.only(left: 16, right: 8),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: surface,
             borderRadius: BorderRadius.circular(AppRadii.xl),
-            border: Border.all(color: AppColors.border),
-            boxShadow: AppShadows.card,
+            border: Border.all(color: border),
+            boxShadow: AppShadows.card(context),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -114,12 +119,22 @@ class _SendButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+    final primary = theme.colorScheme.primary;
+    final onPrimary =
+        isDark ? AppColorsDark.textOnPrimary : AppColorsLight.textOnPrimary;
+
     return AnimatedContainer(
       duration: AppDurations.fast,
       width: 38,
       height: 38,
       decoration: BoxDecoration(
-        color: enabled ? AppColors.primary : AppColors.surfaceMuted,
+        color: enabled ? primary : surfaceMuted,
         borderRadius: BorderRadius.circular(AppRadii.md),
       ),
       child: IconButton(
@@ -128,7 +143,7 @@ class _SendButton extends StatelessWidget {
         icon: Icon(
           Icons.arrow_upward_rounded,
           size: 20,
-          color: enabled ? AppColors.secondary : AppColors.textTertiary,
+          color: enabled ? onPrimary : textTertiary,
         ),
       ),
     );

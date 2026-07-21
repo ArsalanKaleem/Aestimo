@@ -1,30 +1,29 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
+import 'package:careergpt/core/gemini/gemini_providers.dart';
 import 'package:careergpt/main.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Aestimo app smoke test', (WidgetTester tester) async {
+    // 1. Build the container with overrides as done in main()
+    final container = ProviderContainer(
+      overrides: buildGeminiOverrides(),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // 2. Build our app within UncontrolledProviderScope
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const AestimoApp(),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // 3. Trigger a frame
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // 4. Update your expectations based on your actual UI content
+    // Since 'Counter' was a default example, you should replace these
+    // with expects that verify your actual home screen content.
+    // Example: expect(find.text('Welcome to Aestimo'), findsOneWidget);
   });
 }

@@ -77,8 +77,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               constraints: const BoxConstraints(maxWidth: 880),
               child: ChatInput(
                 enabled: !state.isResponding,
-                onSend: (text) =>
-                    ref.read(chatProvider.notifier).send(text),
+                onSend: (text) => ref.read(chatProvider.notifier).send(text),
               ),
             ),
           ),
@@ -95,8 +94,13 @@ class _ChatHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return Container(
-      color: AppColors.background,
+      color: theme.scaffoldBackgroundColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
@@ -105,10 +109,8 @@ class _ChatHeader extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('AI Career Assistant',
-                  style: Theme.of(context).textTheme.titleMedium),
-              Text('Grounded in your resume',
-                  style: Theme.of(context).textTheme.bodySmall),
+              Text('AI Career Assistant', style: theme.textTheme.titleMedium),
+              Text('Grounded in your resume', style: theme.textTheme.bodySmall),
             ],
           ),
           const Spacer(),
@@ -117,8 +119,7 @@ class _ChatHeader extends StatelessWidget {
               onPressed: onClear,
               icon: const Icon(Icons.delete_sweep_outlined, size: 18),
               label: const Text('Clear'),
-              style:
-                  TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
+              style: TextButton.styleFrom(foregroundColor: textSecondary),
             ),
         ],
       ),
@@ -145,9 +146,11 @@ class _ChatEmptyState extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
+                  // Fixed brand gradient chip — same convention as AppLogo's
+                  // icon mark, intentionally unchanged across themes.
                   gradient: AppColors.brandGradient,
                   borderRadius: BorderRadius.circular(AppRadii.lg),
-                  boxShadow: AppShadows.card,
+                  boxShadow: AppShadows.card(context),
                 ),
                 child: const Icon(Icons.auto_awesome_rounded,
                     color: AppColors.secondary, size: 30),
@@ -187,8 +190,15 @@ class _PromptChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final textPrimary =
+        isDark ? AppColorsDark.textPrimary : AppColorsLight.textPrimary;
+
     return Material(
-      color: AppColors.surface,
+      color: surface,
       borderRadius: BorderRadius.circular(AppRadii.pill),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadii.pill),
@@ -197,14 +207,14 @@ class _PromptChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadii.pill),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: border),
           ),
           child: Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),

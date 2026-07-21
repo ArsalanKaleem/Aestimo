@@ -106,8 +106,7 @@ class _CoverLetterScreenState extends ConsumerState<CoverLetterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Job details',
-              style: Theme.of(context).textTheme.titleMedium),
+          Text('Job details', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: AppSpacing.lg),
           AppTextField(
             label: 'Job title',
@@ -151,7 +150,16 @@ class _OutputCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(coverLetterProvider);
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final textPrimary =
+        isDark ? AppColorsDark.textPrimary : AppColorsLight.textPrimary;
+    final danger = isDark ? AppColors.dangerDark : AppColors.danger;
 
     return AppCard(
       child: Column(
@@ -189,8 +197,8 @@ class _OutputCard extends ConsumerWidget {
               child: Center(
                 child: Column(
                   children: [
-                    const Icon(Icons.description_outlined,
-                        size: 40, color: AppColors.textTertiary),
+                    Icon(Icons.description_outlined,
+                        size: 40, color: textTertiary),
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       'Fill in the job details and your tailored letter will '
@@ -207,7 +215,7 @@ class _OutputCard extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
+                color: surfaceMuted,
                 borderRadius: BorderRadius.circular(AppRadii.md),
               ),
               child: MarkdownBody(
@@ -215,7 +223,7 @@ class _OutputCard extends ConsumerWidget {
                 selectable: true,
                 styleSheet: MarkdownStyleSheet(
                   p: t.bodyLarge?.copyWith(
-                    color: AppColors.textPrimary,
+                    color: textPrimary,
                     height: 1.55,
                   ),
                   strong: t.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
@@ -224,8 +232,7 @@ class _OutputCard extends ConsumerWidget {
             ),
           if (state.error != null) ...[
             const SizedBox(height: AppSpacing.sm),
-            Text(state.error!,
-                style: t.bodySmall?.copyWith(color: AppColors.danger)),
+            Text(state.error!, style: t.bodySmall?.copyWith(color: danger)),
           ],
         ],
       ),
@@ -246,6 +253,10 @@ class _IconAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return Tooltip(
       message: tooltip,
       child: InkWell(
@@ -253,7 +264,7 @@ class _IconAction extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadii.sm),
         child: Padding(
           padding: const EdgeInsets.all(6),
-          child: Icon(icon, size: 18, color: AppColors.textSecondary),
+          child: Icon(icon, size: 18, color: textSecondary),
         ),
       ),
     );

@@ -132,13 +132,17 @@ class _TopBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return Row(
       children: [
         const Spacer(),
         IconButton(
           onPressed: () {},
           icon: const Icon(Icons.notifications_none_rounded),
-          color: AppColors.textSecondary,
+          color: textSecondary,
         ),
         const SizedBox(width: 4),
         _AccountMenu(user: user),
@@ -157,18 +161,40 @@ class _AccountMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final primary = theme.colorScheme.primary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final textPrimary =
+        isDark ? AppColorsDark.textPrimary : AppColorsLight.textPrimary;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+    final onPrimary =
+        isDark ? AppColorsDark.textOnPrimary : AppColorsLight.textOnPrimary;
+    final danger = isDark ? AppColors.dangerDark : AppColors.danger;
+    // Sign-out icon chip background: a light-red tint. Resolved for dark
+    // mode so it stays legible against the dark menu surface instead of
+    // looking like a stray light patch.
+    final dangerBg = isDark
+        ? AppColors.dangerDark.withValues(alpha: 0.16)
+        : const Color(0xFFFEE2E2);
+
     return PopupMenuButton<String>(
       tooltip: '',
       offset: const Offset(0, 52),
       padding: EdgeInsets.zero,
       position: PopupMenuPosition.under,
-      color: AppColors.surface,
+      color: surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadii.lg),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: border),
       ),
-      constraints: const BoxConstraints(minWidth: _menuWidth, maxWidth: _menuWidth),
+      constraints:
+          const BoxConstraints(minWidth: _menuWidth, maxWidth: _menuWidth),
       onSelected: (v) {
         if (v == 'signout') ref.read(authProvider.notifier).signOut();
         if (v == 'settings') context.go(AppRoutes.settings);
@@ -183,15 +209,15 @@ class _AccountMenu extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundColor: AppColors.primarySoft,
+                  backgroundColor: primarySoft,
                   foregroundImage: (user?.photoUrl != null &&
                           (user?.photoUrl as String).trim().isNotEmpty)
                       ? NetworkImage(user!.photoUrl as String)
                       : null,
                   child: Text(
                     user?.initials ?? '?',
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    style: TextStyle(
+                      color: primary,
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                     ),
@@ -209,8 +235,8 @@ class _AccountMenu extends ConsumerWidget {
                             ? user!.displayName as String
                             : 'Your account',
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
+                        style: TextStyle(
+                          color: textPrimary,
                           fontWeight: FontWeight.w600,
                           fontSize: 13.5,
                         ),
@@ -219,8 +245,8 @@ class _AccountMenu extends ConsumerWidget {
                       Text(
                         user?.email ?? '',
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.textTertiary,
+                        style: TextStyle(
+                          color: textTertiary,
                           fontSize: 12,
                         ),
                       ),
@@ -231,19 +257,19 @@ class _AccountMenu extends ConsumerWidget {
             ),
           ),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           enabled: false,
           height: 1,
           padding: EdgeInsets.zero,
-          child: Divider(height: 1, thickness: 1, color: AppColors.border),
+          child: Divider(height: 1, thickness: 1, color: border),
         ),
         PopupMenuItem<String>(
           value: 'settings',
           padding: EdgeInsets.zero,
           child: _MenuTile(
             icon: Icons.settings_outlined,
-            iconColor: AppColors.primary,
-            iconBg: AppColors.primarySoft,
+            iconColor: primary,
+            iconBg: primarySoft,
             label: 'Settings',
           ),
         ),
@@ -258,10 +284,10 @@ class _AccountMenu extends ConsumerWidget {
           padding: EdgeInsets.zero,
           child: _MenuTile(
             icon: Icons.logout_rounded,
-            iconColor: AppColors.danger,
-            iconBg: const Color(0xFFFEE2E2),
+            iconColor: danger,
+            iconBg: dangerBg,
             label: 'Sign out',
-            labelColor: AppColors.danger,
+            labelColor: danger,
           ),
         ),
       ],
@@ -269,19 +295,19 @@ class _AccountMenu extends ConsumerWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: border),
         ),
         child: CircleAvatar(
           radius: 17,
-          backgroundColor: AppColors.primary,
+          backgroundColor: primary,
           foregroundImage: (user?.photoUrl != null &&
                   (user?.photoUrl as String).trim().isNotEmpty)
               ? NetworkImage(user!.photoUrl as String)
               : null,
           child: Text(
             user?.initials ?? '?',
-            style: const TextStyle(
-              color: AppColors.secondary,
+            style: TextStyle(
+              color: onPrimary,
               fontWeight: FontWeight.w600,
               fontSize: 13,
             ),
@@ -311,6 +337,10 @@ class _MenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary =
+        isDark ? AppColorsDark.textPrimary : AppColorsLight.textPrimary;
+
     // PopupMenuItem already wraps its child in an InkWell that pops the
     // menu with `value` on tap, so this widget stays purely presentational.
     return Padding(
@@ -330,7 +360,7 @@ class _MenuTile extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: labelColor ?? AppColors.textPrimary,
+              color: labelColor ?? textPrimary,
               fontWeight: FontWeight.w500,
               fontSize: 13.5,
             ),
@@ -348,16 +378,25 @@ class _ResumeStatusBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ready = resume.hasResume;
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final primary = theme.colorScheme.primary;
+    final warning = isDark ? AppColors.warningDark : AppColors.warning;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
 
     return AppCard(
-      color: ready ? AppColors.primarySoft : AppColors.surface,
+      color: ready ? primarySoft : surface,
       onTap: ready ? null : () => context.go(AppRoutes.upload),
       child: Row(
         children: [
           Icon(
             ready ? Icons.verified_rounded : Icons.info_outline_rounded,
-            color: ready ? AppColors.primary : AppColors.warning,
+            color: ready ? primary : warning,
             size: 26,
           ),
           const SizedBox(width: AppSpacing.md),
@@ -381,9 +420,7 @@ class _ResumeStatusBanner extends StatelessWidget {
               ],
             ),
           ),
-          if (!ready)
-            const Icon(Icons.arrow_forward_rounded,
-                color: AppColors.textTertiary),
+          if (!ready) Icon(Icons.arrow_forward_rounded, color: textTertiary),
         ],
       ),
     );

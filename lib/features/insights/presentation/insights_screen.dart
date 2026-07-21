@@ -32,8 +32,7 @@ class InsightsScreen extends ConsumerWidget {
               return EmptyState(
                 icon: Icons.insights_rounded,
                 title: 'No resume to analyze yet',
-                message:
-                    'Upload your resume and we’ll break down your skills, '
+                message: 'Upload your resume and we’ll break down your skills, '
                     'experience, strengths, and gaps.',
                 actionLabel: 'Upload resume',
                 onAction: () => context.go(AppRoutes.upload),
@@ -58,6 +57,11 @@ class _InsightsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final twoCol = context.isDesktop;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
 
     final skills = _SkillsCard(insights: insights);
     final experience = _ExperienceCard(insights: insights);
@@ -75,19 +79,18 @@ class _InsightsBody extends StatelessWidget {
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.primarySoft,
+              color: primarySoft,
               borderRadius: BorderRadius.circular(AppRadii.pill),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.auto_awesome_rounded,
-                    size: 15, color: AppColors.primary),
-                SizedBox(width: 6),
+              children: [
+                Icon(Icons.auto_awesome_rounded, size: 15, color: primary),
+                const SizedBox(width: 6),
                 Text(
                   'AI generated',
                   style: TextStyle(
-                    color: AppColors.primaryDarker,
+                    color: primary,
                     fontWeight: FontWeight.w600,
                     fontSize: 12.5,
                   ),
@@ -143,37 +146,58 @@ class _CardTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return Row(
       children: [
         Container(
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            color: AppColors.primarySoft,
+            color: primarySoft,
             borderRadius: BorderRadius.circular(AppRadii.md),
           ),
-          child: Icon(icon, color: AppColors.primary, size: 19),
+          child: Icon(icon, color: primary, size: 19),
         ),
         const SizedBox(width: AppSpacing.sm),
-        Text(label, style: Theme.of(context).textTheme.titleMedium),
+        Text(label, style: theme.textTheme.titleMedium),
       ],
     );
   }
 }
 
+/// Chip row. Pass [foreground]/[background] to override the default
+/// primary-tinted style (e.g. for soft skills or "worth adding" chips).
+/// Defaults resolve to the current theme's primary tokens when omitted —
+/// they can't be compile-time constants anymore since Light/Dark tokens
+/// aren't const-equal, so resolution happens in [build] instead of in the
+/// constructor signature.
 class _ChipWrap extends StatelessWidget {
   const _ChipWrap({
     required this.items,
-    this.foreground = AppColors.primaryDarker,
-    this.background = AppColors.primarySurface,
+    this.foreground,
+    this.background,
   });
 
   final List<String> items;
-  final Color foreground;
-  final Color background;
+  final Color? foreground;
+  final Color? background;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final primarySurface =
+        isDark ? AppColorsDark.primarySurface : AppColorsLight.primarySurface;
+
+    final fg = foreground ?? primary;
+    final bg = background ?? primarySurface;
+
     return Wrap(
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.sm,
@@ -182,13 +206,13 @@ class _ChipWrap extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: background,
+              color: bg,
               borderRadius: BorderRadius.circular(AppRadii.pill),
             ),
             child: Text(
               item,
               style: TextStyle(
-                color: foreground,
+                color: fg,
                 fontWeight: FontWeight.w500,
                 fontSize: 13,
               ),
@@ -205,12 +229,16 @@ class _MiniLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Text(
         text.toUpperCase(),
-        style: const TextStyle(
-          color: AppColors.textTertiary,
+        style: TextStyle(
+          color: textTertiary,
           fontWeight: FontWeight.w700,
           fontSize: 11,
           letterSpacing: 0.6,
@@ -226,6 +254,19 @@ class _SkillsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final warning = isDark ? AppColors.warningDark : AppColors.warning;
+    // "Worth adding" chip background: light amber tint. Resolved for dark
+    // mode so it doesn't read as a stray bright patch on a dark card.
+    final warningBg = isDark
+        ? AppColors.warningDark.withValues(alpha: 0.16)
+        : const Color(0xFFFEF3E2);
+
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,15 +279,15 @@ class _SkillsCard extends StatelessWidget {
           const _MiniLabel('Soft skills'),
           _ChipWrap(
             items: insights.softSkills,
-            foreground: AppColors.textSecondary,
-            background: AppColors.surfaceMuted,
+            foreground: textSecondary,
+            background: surfaceMuted,
           ),
           const SizedBox(height: AppSpacing.lg),
           const _MiniLabel('Worth adding'),
           _ChipWrap(
             items: insights.missingSkills,
-            foreground: AppColors.warning,
-            background: const Color(0xFFFEF3E2),
+            foreground: warning,
+            background: warningBg,
           ),
         ],
       ),
@@ -260,7 +301,13 @@ class _ExperienceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     final years = insights.yearsExperience;
     final yearsLabel =
         years == years.roundToDouble() ? years.toInt().toString() : '$years';
@@ -277,7 +324,7 @@ class _ExperienceCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: AppColors.primarySoft,
+              color: primarySoft,
               borderRadius: BorderRadius.circular(AppRadii.md),
             ),
             child: Row(
@@ -285,7 +332,7 @@ class _ExperienceCard extends StatelessWidget {
                 Text(
                   yearsLabel,
                   style: t.headlineMedium?.copyWith(
-                    color: AppColors.primary,
+                    color: primary,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -341,12 +388,14 @@ class _Bullet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.primary),
+          Icon(icon, size: 18, color: primary),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
@@ -363,7 +412,15 @@ class _ImprovementsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final primary = theme.colorScheme.primary;
+    final onPrimary =
+        isDark ? AppColorsDark.textOnPrimary : AppColorsLight.textOnPrimary;
+
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,7 +434,7 @@ class _ImprovementsCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
+                color: surfaceMuted,
                 borderRadius: BorderRadius.circular(AppRadii.md),
               ),
               child: Column(
@@ -389,14 +446,14 @@ class _ImprovementsCard extends StatelessWidget {
                         width: 22,
                         height: 22,
                         alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
+                        decoration: BoxDecoration(
+                          color: primary,
                           shape: BoxShape.circle,
                         ),
                         child: Text(
                           '${i + 1}',
-                          style: const TextStyle(
-                            color: AppColors.secondary,
+                          style: TextStyle(
+                            color: onPrimary,
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                           ),

@@ -36,15 +36,20 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
           Text(
             label!,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: AppColors.textPrimary,
-                ),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
         ],
@@ -60,7 +65,7 @@ class AppTextField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, size: 20, color: AppColors.textTertiary)
+                ? Icon(prefixIcon, size: 20, color: textTertiary)
                 : null,
             suffixIcon: suffix,
           ),

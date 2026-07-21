@@ -22,12 +22,17 @@ class ResumeScoreScreen extends ConsumerWidget {
     final resume = ref.watch(resumeProvider);
     final scoreState = ref.watch(resumeScoreProvider);
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     if (!resume.hasResume) {
       return const Scaffold(
         body: EmptyState(
           icon: Icons.score_rounded,
           title: 'No Resume Yet',
-          message:'Upload your PDF resume first to get an ATS score.',
+          message: 'Upload your PDF resume first to get an ATS score.',
         ),
       );
     }
@@ -48,23 +53,22 @@ class ResumeScoreScreen extends ConsumerWidget {
                     children: [
                       Text(
                         'Resume Score',
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: theme.textTheme.headlineMedium,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'AI-powered ATS compatibility analysis',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: textSecondary,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 if (scoreState.hasScore)
                   OutlinedButton.icon(
-                    onPressed: () => ref
-                        .read(resumeScoreProvider.notifier)
-                        .analyse(),
+                    onPressed: () =>
+                        ref.read(resumeScoreProvider.notifier).analyse(),
                     icon: const Icon(Icons.refresh_rounded, size: 18),
                     label: const Text('Re-analyse'),
                   ),
@@ -75,8 +79,7 @@ class ResumeScoreScreen extends ConsumerWidget {
             // ── Idle state ──────────────────────────────────────────────────
             if (scoreState.status == ScoreStatus.idle) ...[
               _AnalyseCta(
-                onTap: () =>
-                    ref.read(resumeScoreProvider.notifier).analyse(),
+                onTap: () => ref.read(resumeScoreProvider.notifier).analyse(),
               ),
             ],
 
@@ -89,8 +92,7 @@ class ResumeScoreScreen extends ConsumerWidget {
             if (scoreState.status == ScoreStatus.error) ...[
               _ErrorCard(
                 message: scoreState.error ?? 'Something went wrong.',
-                onRetry: () =>
-                    ref.read(resumeScoreProvider.notifier).analyse(),
+                onRetry: () => ref.read(resumeScoreProvider.notifier).analyse(),
               ),
             ],
 
@@ -116,6 +118,14 @@ class _AnalyseCta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return AppCard(
       child: Column(
         children: [
@@ -124,27 +134,27 @@ class _AnalyseCta extends StatelessWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: AppColors.primarySoft,
+              color: primarySoft,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.analytics_rounded,
               size: 36,
-              color: AppColors.primary,
+              color: primary,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
             'Get Your ATS Score',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           Text(
             'We will ll analyse your resume across 6 key categories and give you an ATS compatibility score with actionable feedback.',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: textSecondary,
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           PrimaryButton(
@@ -168,23 +178,29 @@ class _LoadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           children: [
-            const CircularProgressIndicator(color: AppColors.primary),
+            CircularProgressIndicator(color: primary),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Analysing your resume…',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 6),
             Text(
               'Our AI is scoring your resume across 6 categories.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: textSecondary,
+              ),
             ),
           ],
         ),
@@ -205,13 +221,15 @@ class _ErrorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final danger = isDark ? AppColors.dangerDark : AppColors.danger;
+
     return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           children: [
-            const Icon(Icons.error_outline_rounded,
-                size: 48, color: AppColors.danger),
+            Icon(Icons.error_outline_rounded, size: 48, color: danger),
             const SizedBox(height: AppSpacing.sm),
             Text(message,
                 textAlign: TextAlign.center,
@@ -240,6 +258,23 @@ class _ResultsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final success = isDark ? AppColors.successDark : AppColors.success;
+    final danger = isDark ? AppColors.dangerDark : AppColors.danger;
+
+    // Keyword chip backgrounds: kept as light, fixed tints in both themes
+    // (matches the "document preview" convention used on the ATS resume
+    // screen). Swap to the commented dark-aware version below if you'd
+    // rather they invert with the theme.
+    final foundBg = const Color(0xFFDCFCE7);
+    final missingBg = const Color(0xFFFFEBEE);
+    // final foundBg = isDark
+    //     ? AppColors.successDark.withValues(alpha: 0.15)
+    //     : const Color(0xFFDCFCE7);
+    // final missingBg = isDark
+    //     ? AppColors.dangerDark.withValues(alpha: 0.15)
+    //     : const Color(0xFFFFEBEE);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -260,10 +295,10 @@ class _ResultsView extends StatelessWidget {
         _TwoColSection(
           leftTitle: '✅ Top Strengths',
           leftItems: score.topStrengths,
-          leftColor: AppColors.success,
+          leftColor: success,
           rightTitle: '🔧 Critical Fixes',
           rightItems: score.criticalFixes,
-          rightColor: AppColors.danger,
+          rightColor: danger,
         ),
         const SizedBox(height: AppSpacing.lg),
 
@@ -279,16 +314,16 @@ class _ResultsView extends StatelessWidget {
                 _KeywordChips(
                   label: 'Found in Resume',
                   keywords: score.atsKeywords,
-                  color: AppColors.success,
-                  bgColor: const Color(0xFFDCFCE7),
+                  color: success,
+                  bgColor: foundBg,
                 ),
                 if (score.missingKeywords.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.md),
                   _KeywordChips(
                     label: 'Missing Keywords',
                     keywords: score.missingKeywords,
-                    color: AppColors.danger,
-                    bgColor: const Color(0xFFFFEBEE),
+                    color: danger,
+                    bgColor: missingBg,
                   ),
                 ],
               ],
@@ -309,38 +344,53 @@ class _OverallScoreCard extends StatelessWidget {
 
   final ResumeScore score;
 
-  Color get _gaugeColor {
-    if (score.overallScore >= 80) return AppColors.success;
-    if (score.overallScore >= 60) return AppColors.warning;
-    return AppColors.danger;
+  Color _gaugeColor(bool isDark) {
+    if (score.overallScore >= 80) {
+      return isDark ? AppColors.successDark : AppColors.success;
+    }
+    if (score.overallScore >= 60) {
+      return isDark ? AppColors.warningDark : AppColors.warning;
+    }
+    return isDark ? AppColors.dangerDark : AppColors.danger;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final gaugeColor = _gaugeColor(isDark);
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+
     return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Row(
           children: [
-            _CircularGauge(value: score.overallScore / 100, color: _gaugeColor,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${score.overallScore}',
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: _gaugeColor,
-                          ),
+            _CircularGauge(
+              value: score.overallScore / 100,
+              color: gaugeColor,
+              trackColor: border,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${score.overallScore}',
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: gaugeColor,
                     ),
-                    Text(
-                      '/100',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
+                  ),
+                  Text(
+                    '/100',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: textSecondary,
                     ),
-                  ],
-                )),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
@@ -352,13 +402,13 @@ class _OverallScoreCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _gaugeColor.withOpacity(0.1),
+                          color: gaugeColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppRadii.pill),
                         ),
                         child: Text(
                           '${score.grade} · ${score.gradeLabel}',
                           style: TextStyle(
-                            color: _gaugeColor,
+                            color: gaugeColor,
                             fontWeight: FontWeight.w700,
                             fontSize: 13,
                           ),
@@ -369,15 +419,15 @@ class _OverallScoreCard extends StatelessWidget {
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     'ATS Compatibility Score',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Based on 6 categories including keywords, formatting, '
                     'experience, and achievements.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -393,11 +443,13 @@ class _CircularGauge extends StatelessWidget {
   const _CircularGauge({
     required this.value,
     required this.color,
+    required this.trackColor,
     required this.child,
   });
 
   final double value;
   final Color color;
+  final Color trackColor;
   final Widget child;
 
   @override
@@ -406,7 +458,8 @@ class _CircularGauge extends StatelessWidget {
       width: 110,
       height: 110,
       child: CustomPaint(
-        painter: _GaugePainter(value: value, color: color),
+        painter:
+            _GaugePainter(value: value, color: color, trackColor: trackColor),
         child: Center(child: child),
       ),
     );
@@ -414,10 +467,15 @@ class _CircularGauge extends StatelessWidget {
 }
 
 class _GaugePainter extends CustomPainter {
-  _GaugePainter({required this.value, required this.color});
+  _GaugePainter({
+    required this.value,
+    required this.color,
+    required this.trackColor,
+  });
 
   final double value;
   final Color color;
+  final Color trackColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -430,7 +488,7 @@ class _GaugePainter extends CustomPainter {
       center,
       radius,
       Paint()
-        ..color = AppColors.border
+        ..color = trackColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth,
     );
@@ -451,7 +509,7 @@ class _GaugePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_GaugePainter old) =>
-      old.value != value || old.color != color;
+      old.value != value || old.color != color || old.trackColor != trackColor;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -463,14 +521,25 @@ class _CategoryRow extends StatelessWidget {
 
   final ScoreCategory category;
 
-  Color get _barColor {
-    if (category.fraction >= 0.8) return AppColors.success;
-    if (category.fraction >= 0.6) return AppColors.warning;
-    return AppColors.danger;
+  Color _barColor(bool isDark) {
+    if (category.fraction >= 0.8) {
+      return isDark ? AppColors.successDark : AppColors.success;
+    }
+    if (category.fraction >= 0.6) {
+      return isDark ? AppColors.warningDark : AppColors.warning;
+    }
+    return isDark ? AppColors.dangerDark : AppColors.danger;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final barColor = _barColor(isDark);
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -482,18 +551,16 @@ class _CategoryRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     category.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall
+                    style: theme.textTheme.titleSmall
                         ?.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ),
                 Text(
                   '${category.score}/${category.maxScore}',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: _barColor,
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: barColor,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
@@ -503,16 +570,16 @@ class _CategoryRow extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: category.fraction,
                 minHeight: 8,
-                backgroundColor: AppColors.border,
-                valueColor: AlwaysStoppedAnimation<Color>(_barColor),
+                backgroundColor: border,
+                valueColor: AlwaysStoppedAnimation<Color>(barColor),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               category.feedback,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: textSecondary,
+              ),
             ),
           ],
         ),
@@ -554,7 +621,8 @@ class _TwoColSection extends StatelessWidget {
             dotColor: leftColor,
           ),
         ),
-        SizedBox(width: isWide ? AppSpacing.md : 0,
+        SizedBox(
+            width: isWide ? AppSpacing.md : 0,
             height: isWide ? 0 : AppSpacing.sm),
         Expanded(
           child: _ListCard(
@@ -565,7 +633,8 @@ class _TwoColSection extends StatelessWidget {
         ),
       ];
       return isWide
-          ? Row(crossAxisAlignment: CrossAxisAlignment.start, children: children)
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start, children: children)
           : Column(children: [
               _ListCard(
                   title: leftTitle, items: leftItems, dotColor: leftColor),
@@ -587,6 +656,11 @@ class _ListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -594,9 +668,7 @@ class _ListCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
+                style: theme.textTheme.titleSmall
                     ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: AppSpacing.sm),
             ...items.map((item) => Padding(
@@ -616,10 +688,9 @@ class _ListCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           item,
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: textSecondary,
+                          ),
                         ),
                       ),
                     ],
@@ -651,26 +722,28 @@ class _KeywordChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: AppColors.textSecondary)),
+            style: theme.textTheme.bodySmall?.copyWith(color: textSecondary)),
         const SizedBox(height: 8),
         Wrap(
           spacing: 6,
           runSpacing: 6,
           children: keywords
               .map((k) => Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: bgColor,
                       borderRadius: BorderRadius.circular(AppRadii.pill),
-                      border: Border.all(color: color.withOpacity(0.3)),
+                      border: Border.all(color: color.withValues(alpha: 0.3)),
                     ),
                     child: Text(k,
                         style: TextStyle(

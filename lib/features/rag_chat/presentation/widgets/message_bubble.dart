@@ -13,6 +13,12 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final primary = theme.colorScheme.primary;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
@@ -29,23 +35,20 @@ class MessageBubble extends StatelessWidget {
               children: [
                 Container(
                   constraints: const BoxConstraints(maxWidth: 640),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isUser ? AppColors.primary : AppColors.surface,
+                    color: isUser ? primary : surface,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppRadii.lg),
                       topRight: const Radius.circular(AppRadii.lg),
                       bottomLeft:
                           Radius.circular(isUser ? AppRadii.lg : AppRadii.sm),
                       bottomRight:
-                          Radius.circular(isUser ? AppRadii.sm
-                              : AppRadii.lg),
+                          Radius.circular(isUser ? AppRadii.sm : AppRadii.lg),
                     ),
-                    border: isUser
-                        ? null
-                        : Border.all(color: AppColors.border),
-                    boxShadow: isUser ? null : AppShadows.card,
+                    border: isUser ? null : Border.all(color: border),
+                    boxShadow: isUser ? null : AppShadows.card(context),
                   ),
                   child: _BubbleContent(message: message),
                 ),
@@ -73,10 +76,21 @@ class _BubbleContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textOnPrimary =
+        isDark ? AppColorsDark.textOnPrimary : AppColorsLight.textOnPrimary;
+    final textPrimary =
+        isDark ? AppColorsDark.textPrimary : AppColorsLight.textPrimary;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+
     if (message.isUser) {
       return Text(
         message.content,
-        style: const TextStyle(color: AppColors.secondary, height: 1.5),
+        style: TextStyle(color: textOnPrimary, height: 1.5),
       );
     }
 
@@ -84,25 +98,25 @@ class _BubbleContent extends StatelessWidget {
       return const TypingIndicator();
     }
 
-    final base = Theme.of(context).textTheme.bodyLarge!;
+    final base = theme.textTheme.bodyLarge!;
     return MarkdownBody(
       data: message.content,
       selectable: true,
       styleSheet: MarkdownStyleSheet(
-        p: base.copyWith(color: AppColors.textPrimary),
+        p: base.copyWith(color: textPrimary),
         strong: base.copyWith(fontWeight: FontWeight.w700),
-        listBullet: base.copyWith(color: AppColors.textPrimary),
+        listBullet: base.copyWith(color: textPrimary),
         code: base.copyWith(
           fontFamily: 'monospace',
-          backgroundColor: AppColors.surfaceMuted,
+          backgroundColor: surfaceMuted,
           fontSize: 13.5,
         ),
         codeblockDecoration: BoxDecoration(
-          color: AppColors.surfaceMuted,
+          color: surfaceMuted,
           borderRadius: BorderRadius.circular(AppRadii.sm),
         ),
         blockquoteDecoration: BoxDecoration(
-          color: AppColors.primarySoft,
+          color: primarySoft,
           borderRadius: BorderRadius.circular(AppRadii.sm),
         ),
       ),
@@ -116,11 +130,15 @@ class _MessageActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+
     return Padding(
       padding: const EdgeInsets.only(top: 4, left: 4),
       child: TextButton.icon(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.textTertiary,
+          foregroundColor: textTertiary,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -145,14 +163,23 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final textOnPrimary =
+        isDark ? AppColorsDark.textOnPrimary : AppColorsLight.textOnPrimary;
+    final primary = theme.colorScheme.primary;
+
     return CircleAvatar(
       radius: 16,
-      backgroundColor:
-          isUser ? AppColors.surfaceMuted : AppColors.primary,
+      backgroundColor: isUser ? surfaceMuted : primary,
       child: Icon(
         isUser ? Icons.person_rounded : Icons.auto_awesome_rounded,
         size: 16,
-        color: isUser ? AppColors.textSecondary : AppColors.secondary,
+        color: isUser ? textSecondary : textOnPrimary,
       ),
     );
   }
@@ -181,6 +208,10 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+
     return SizedBox(
       height: 18,
       child: AnimatedBuilder(
@@ -195,9 +226,9 @@ class _TypingIndicatorState extends State<TypingIndicator>
                 padding: const EdgeInsets.symmetric(horizontal: 2.5),
                 child: Transform.scale(
                   scale: scale,
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     radius: 3.5,
-                    backgroundColor: AppColors.textTertiary,
+                    backgroundColor: textTertiary,
                   ),
                 ),
               );

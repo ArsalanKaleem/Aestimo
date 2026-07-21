@@ -20,7 +20,12 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final markColor = onLight ? AppColors.secondary : AppColors.textPrimary;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textPrimary =
+        isDark ? AppColorsDark.textPrimary : AppColorsLight.textPrimary;
+
+    final markColor = onLight ? AppColors.secondary : textPrimary;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -31,7 +36,7 @@ class AppLogo extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: AppColors.brandGradient,
             borderRadius: BorderRadius.circular(size * 0.3),
-            boxShadow: AppShadows.card,
+            boxShadow: AppShadows.card(context),
           ),
           alignment: Alignment.center,
           child: Icon(
