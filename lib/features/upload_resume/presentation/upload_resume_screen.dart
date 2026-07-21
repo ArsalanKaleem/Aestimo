@@ -36,7 +36,8 @@ class UploadResumeScreen extends ConsumerWidget {
 
     return Scaffold(
       body: ResponsiveContainer(
-        padding: EdgeInsets.all(context.responsive(mobile: 16.0, desktop: 32.0)),
+        padding:
+            EdgeInsets.all(context.responsive(mobile: 16.0, desktop: 32.0)),
         child: ListView(
           children: [
             const SizedBox(height: 8),
@@ -65,6 +66,9 @@ class UploadResumeScreen extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final danger = isDark ? AppColors.dangerDark : AppColors.danger;
+
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -79,7 +83,7 @@ class UploadResumeScreen extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            style: FilledButton.styleFrom(backgroundColor: danger),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Delete'),
           ),
@@ -96,6 +100,12 @@ class _DropZone extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return DottedBorderBox(
       onTap: onPick,
       child: Padding(
@@ -106,20 +116,18 @@ class _DropZone extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.primarySoft,
+                color: primarySoft,
                 borderRadius: BorderRadius.circular(AppRadii.lg),
               ),
-              child: const Icon(Icons.upload_file_rounded,
-                  color: AppColors.primary, size: 30),
+              child: Icon(Icons.upload_file_rounded, color: primary, size: 30),
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text('Upload your resume',
-                style: Theme.of(context).textTheme.titleLarge),
+            Text('Upload your resume', style: theme.textTheme.titleLarge),
             const SizedBox(height: 6),
             Text(
               'PDF up to 10 MB. We extract, chunk, and embed it for search.',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: AppSpacing.lg),
             PrimaryButton(
@@ -142,13 +150,19 @@ class DottedBorderBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.primarySoft.withValues(alpha: 0.4),
+          color: primarySoft.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(AppRadii.lg),
           border: Border.all(
+            // Fixed brand accent border — same in both themes, matches the
+            // AppCard hover-border convention.
             color: AppColors.primaryLight,
             width: 1.4,
           ),
@@ -165,6 +179,11 @@ class _IngestProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,10 +198,10 @@ class _IngestProgressCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text('Processing resume',
-                    style: Theme.of(context).textTheme.titleMedium),
+                    style: theme.textTheme.titleMedium),
               ),
               Text('${(state.progress * 100).round()}%',
-                  style: Theme.of(context).textTheme.titleMedium),
+                  style: theme.textTheme.titleMedium),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
@@ -191,12 +210,11 @@ class _IngestProgressCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: state.progress,
               minHeight: 8,
-              backgroundColor: AppColors.surfaceMuted,
+              backgroundColor: surfaceMuted,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(state.progressLabel ?? '',
-              style: Theme.of(context).textTheme.bodyMedium),
+          Text(state.progressLabel ?? '', style: theme.textTheme.bodyMedium),
         ],
       ),
     );
@@ -216,7 +234,12 @@ class _ResumeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final danger = isDark ? AppColors.dangerDark : AppColors.danger;
+    final success = isDark ? AppColors.successDark : AppColors.success;
+
     return AppCard(
       child: Column(
         children: [
@@ -226,11 +249,11 @@ class _ResumeCard extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.danger.withValues(alpha: 0.08),
+                  color: danger.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppRadii.md),
                 ),
-                child: const Icon(Icons.picture_as_pdf_rounded,
-                    color: AppColors.danger, size: 26),
+                child:
+                    Icon(Icons.picture_as_pdf_rounded, color: danger, size: 26),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
@@ -254,19 +277,17 @@ class _ResumeCard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withValues(alpha: 0.1),
+                  color: success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadii.pill),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.check_circle_rounded,
-                        size: 14, color: AppColors.success),
+                    Icon(Icons.check_circle_rounded, size: 14, color: success),
                     const SizedBox(width: 4),
                     Text('Indexed',
                         style: t.bodySmall?.copyWith(
-                            color: AppColors.success,
-                            fontWeight: FontWeight.w600)),
+                            color: success, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
@@ -287,9 +308,8 @@ class _ResumeCard extends StatelessWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.danger,
-                    side: BorderSide(
-                        color: AppColors.danger.withValues(alpha: 0.4)),
+                    foregroundColor: danger,
+                    side: BorderSide(color: danger.withValues(alpha: 0.4)),
                   ),
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline_rounded, size: 19),
@@ -309,17 +329,33 @@ class _PipelineExplainer extends StatelessWidget {
 
   static const _steps = [
     ('Extract', Icons.text_snippet_outlined, 'Pull raw text from the PDF'),
-    ('Chunk', Icons.dashboard_customize_outlined, 'Split into overlapping passages'),
+    (
+      'Chunk',
+      Icons.dashboard_customize_outlined,
+      'Split into overlapping passages'
+    ),
     ('Embed', Icons.scatter_plot_outlined, 'text-embedding-3-small vectors'),
     ('Store', Icons.storage_outlined, 'Index vectors in ChromaDB'),
-    ('Search', Icons.travel_explore_outlined, 'Semantic retrieval at query time'),
+    (
+      'Search',
+      Icons.travel_explore_outlined,
+      'Semantic retrieval at query time'
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return AppCard(
-      color: AppColors.surfaceMuted,
+      color: surfaceMuted,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -333,16 +369,17 @@ class _PipelineExplainer extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 16,
-                    backgroundColor: AppColors.primarySoft,
-                    child: Icon(icon, size: 17, color: AppColors.primary),
+                    backgroundColor: primarySoft,
+                    child: Icon(icon, size: 17, color: primary),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text('$label  ',
-                      style: t.bodyLarge
-                          ?.copyWith(fontWeight: FontWeight.w600)),
+                      style:
+                          t.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
                   Expanded(
                       child: Text(desc,
-                          style: t.bodyMedium, overflow: TextOverflow.ellipsis)),
+                          style: t.bodyMedium,
+                          overflow: TextOverflow.ellipsis)),
                 ],
               ),
             );

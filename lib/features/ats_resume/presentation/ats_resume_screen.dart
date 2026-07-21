@@ -43,11 +43,13 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
 
   void _generate() {
     ref.read(atsResumeProvider.notifier).generate(
-      jobTitle:
-      _jobTitleCtrl.text.trim().isEmpty ? null : _jobTitleCtrl.text.trim(),
-      jobDescription:
-      _jobDescCtrl.text.trim().isEmpty ? null : _jobDescCtrl.text.trim(),
-    );
+          jobTitle: _jobTitleCtrl.text.trim().isEmpty
+              ? null
+              : _jobTitleCtrl.text.trim(),
+          jobDescription: _jobDescCtrl.text.trim().isEmpty
+              ? null
+              : _jobDescCtrl.text.trim(),
+        );
   }
 
   Future<void> _downloadPdf() async {
@@ -58,7 +60,6 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
 
   Future<void> _savePdf(Uint8List bytes, String filename) async {
     if (kIsWeb) {
-      // Web: trigger browser download via Blob URL
       final blob = html.Blob([bytes], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
       html.AnchorElement(href: url)
@@ -71,21 +72,19 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
         );
       }
     } else {
-      // Desktop / Mobile: write to Downloads folder (or Documents as fallback)
       try {
         Directory? saveDir;
 
         if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-          // Desktop — prefer the user's Downloads folder
-          final home = Platform.environment['USERPROFILE']  // Windows
-              ?? Platform.environment['HOME'];               // macOS / Linux
+          final home = Platform.environment['USERPROFILE'] ??
+              Platform.environment['HOME'];
           if (home != null) {
-            final downloads = Directory('$home${Platform.pathSeparator}Downloads');
+            final downloads =
+                Directory('$home${Platform.pathSeparator}Downloads');
             saveDir = downloads.existsSync() ? downloads : Directory(home);
           }
         }
 
-        // Fallback: app documents directory (works on all platforms)
         saveDir ??= await getApplicationDocumentsDirectory();
 
         final file = File('${saveDir.path}${Platform.pathSeparator}$filename');
@@ -105,10 +104,11 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
         }
       } catch (e) {
         if (mounted) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Failed to save PDF: $e'),
-              backgroundColor: AppColors.danger,
+              backgroundColor: isDark ? AppColors.dangerDark : AppColors.danger,
             ),
           );
         }
@@ -120,6 +120,13 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
   Widget build(BuildContext context) {
     final resume = ref.watch(resumeProvider);
     final ats = ref.watch(atsResumeProvider);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final primary = theme.colorScheme.primary;
+    final textOnPrimary =
+        isDark ? AppColorsDark.textOnPrimary : AppColorsLight.textOnPrimary;
 
     if (!resume.hasResume) {
       return const Scaffold(
@@ -146,15 +153,12 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('ATS Resume',
-                          style:
-                          Theme.of(context).textTheme.headlineMedium),
+                      Text('ATS Resume', style: theme.textTheme.headlineMedium),
                       const SizedBox(height: 4),
                       Text(
                         'AI rewrites your resume in a fully ATS-safe format',
-                        style:
-                        Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: textSecondary,
                         ),
                       ),
                     ],
@@ -170,29 +174,28 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
                   const SizedBox(width: 8),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.textOnPrimary,
+                      backgroundColor: primary,
+                      foregroundColor: textOnPrimary,
                     ),
                     onPressed: ats.isExporting ? null : _downloadPdf,
                     icon: ats.isExporting
                         ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
                         : const Icon(Icons.download_rounded, size: 18),
-                    label: Text(
-                        ats.isExporting ? 'Exporting…' : 'Download PDF'),
+                    label:
+                        Text(ats.isExporting ? 'Exporting…' : 'Download PDF'),
                   ),
                 ],
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // ── Idle / configure ─────────────────────────────────────────────
             if (ats.status == AtsResumeStatus.idle) ...[
               _ConfigCard(
                 showTargeting: _showTargeting,
@@ -204,12 +207,10 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
               ),
             ],
 
-            // ── Generating ───────────────────────────────────────────────────
             if (ats.isGenerating) ...[
               const _GeneratingCard(),
             ],
 
-            // ── Error ────────────────────────────────────────────────────────
             if (ats.status == AtsResumeStatus.error) ...[
               _ErrorCard(
                 message: ats.error ?? 'Something went wrong.',
@@ -217,7 +218,6 @@ class _AtsResumeScreenState extends ConsumerState<AtsResumeScreen> {
               ),
             ],
 
-            // ── Result ───────────────────────────────────────────────────────
             if (ats.hasResume) ...[
               _ResumePreview(resume: ats.resume!),
             ],
@@ -249,23 +249,30 @@ class _ConfigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hero icon + title
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.primarySoft,
+                    color: primarySoft,
                     borderRadius: BorderRadius.circular(AppRadii.md),
                   ),
-                  child: const Icon(Icons.auto_fix_high_rounded,
-                      color: AppColors.primary, size: 28),
+                  child: Icon(Icons.auto_fix_high_rounded,
+                      color: primary, size: 28),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -273,13 +280,13 @@ class _ConfigCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Generate ATS Resume',
-                          style: Theme.of(context).textTheme.titleLarge),
+                          style: theme.textTheme.titleLarge),
                       const SizedBox(height: 2),
                       Text(
                         'AI rewrites your resume with ATS-safe formatting, '
-                            'strong action verbs, and keyword optimisation.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                        'strong action verbs, and keyword optimisation.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: textSecondary,
                         ),
                       ),
                     ],
@@ -288,23 +295,30 @@ class _ConfigCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-
-            // Feature chips
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: const [
-                _FeatureChip(icon: Icons.check_circle_rounded, label: 'Single-column layout'),
-                _FeatureChip(icon: Icons.check_circle_rounded, label: 'Quantified achievements'),
-                _FeatureChip(icon: Icons.check_circle_rounded, label: 'Keyword optimised'),
-                _FeatureChip(icon: Icons.check_circle_rounded, label: 'Standard headings'),
-                _FeatureChip(icon: Icons.check_circle_rounded, label: 'Action verb bullets'),
-                _FeatureChip(icon: Icons.check_circle_rounded, label: 'PDF download'),
+                _FeatureChip(
+                    icon: Icons.check_circle_rounded,
+                    label: 'Single-column layout'),
+                _FeatureChip(
+                    icon: Icons.check_circle_rounded,
+                    label: 'Quantified achievements'),
+                _FeatureChip(
+                    icon: Icons.check_circle_rounded,
+                    label: 'Keyword optimised'),
+                _FeatureChip(
+                    icon: Icons.check_circle_rounded,
+                    label: 'Standard headings'),
+                _FeatureChip(
+                    icon: Icons.check_circle_rounded,
+                    label: 'Action verb bullets'),
+                _FeatureChip(
+                    icon: Icons.check_circle_rounded, label: 'PDF download'),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-
-            // Optional targeting toggle
             GestureDetector(
               onTap: onToggleTargeting,
               child: Row(
@@ -313,7 +327,7 @@ class _ConfigCard extends StatelessWidget {
                     showTargeting
                         ? Icons.expand_less_rounded
                         : Icons.expand_more_rounded,
-                    color: AppColors.primary,
+                    color: primary,
                     size: 20,
                   ),
                   const SizedBox(width: 6),
@@ -321,15 +335,14 @@ class _ConfigCard extends StatelessWidget {
                     showTargeting
                         ? 'Hide job targeting (optional)'
                         : 'Target a specific job (optional)',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.primary,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
-
             if (showTargeting) ...[
               const SizedBox(height: AppSpacing.md),
               TextField(
@@ -352,7 +365,6 @@ class _ConfigCard extends StatelessWidget {
                 ),
               ),
             ],
-
             const SizedBox(height: AppSpacing.lg),
             PrimaryButton(
               label: 'Generate ATS Resume',
@@ -374,22 +386,26 @@ class _FeatureChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.primarySoft,
+        color: primarySoft,
         borderRadius: BorderRadius.circular(AppRadii.pill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.primary),
+          Icon(icon, size: 14, color: primary),
           const SizedBox(width: 5),
           Text(label,
-              style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w500)),
+              style: TextStyle(
+                  fontSize: 12, color: primary, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -405,21 +421,26 @@ class _GeneratingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final primary = theme.colorScheme.primary;
+
     return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           children: [
-            const CircularProgressIndicator(color: AppColors.primary),
+            CircularProgressIndicator(color: primary),
             const SizedBox(height: AppSpacing.md),
-            Text('Generating ATS Resume…',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text('Generating ATS Resume…', style: theme.textTheme.titleMedium),
             const SizedBox(height: 6),
             Text(
               'Our AI is rewriting and optimising your resume. This may take 15–30 seconds.',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: textSecondary,
               ),
             ),
           ],
@@ -441,13 +462,15 @@ class _ErrorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final danger = isDark ? AppColors.dangerDark : AppColors.danger;
+
     return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           children: [
-            const Icon(Icons.error_outline_rounded,
-                size: 48, color: AppColors.danger),
+            Icon(Icons.error_outline_rounded, size: 48, color: danger),
             const SizedBox(height: AppSpacing.sm),
             Text(message,
                 textAlign: TextAlign.center,
@@ -467,6 +490,10 @@ class _ErrorCard extends StatelessWidget {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Resume preview
+// This "paper" mimics a real, printable A4 resume page, so it intentionally
+// stays light/white in BOTH themes — like a document preview in Docs/Word.
+// The success banner above it also stays light-only for the same reason:
+// it reads as "printed paper" content, not app chrome.
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _ResumePreview extends StatelessWidget {
@@ -485,7 +512,7 @@ class _ResumePreview extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFDCFCE7),
             borderRadius: BorderRadius.circular(AppRadii.md),
-            border: Border.all(color: AppColors.success.withOpacity(0.3)),
+            border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -509,48 +536,50 @@ class _ResumePreview extends StatelessWidget {
         const SectionHeader(title: 'Preview'),
         const SizedBox(height: AppSpacing.sm),
 
-        // Paper card mimicking an A4 resume
-        AppCard(
+        // Paper card mimicking an A4 resume — deliberately always white,
+        // with a fixed light-mode card background regardless of app theme.
+        Container(
+          decoration: BoxDecoration(
+            color: AppColorsLight.surface,
+            borderRadius: BorderRadius.circular(AppRadii.lg),
+            border: Border.all(color: AppColorsLight.border),
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Name
                 Text(
                   resume.name.toUpperCase(),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                  ),
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                        color: AppColorsLight.textPrimary,
+                      ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   resume.contactLine,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                        color: AppColorsLight.textSecondary,
+                      ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                const Divider(color: AppColors.textPrimary),
+                const Divider(color: AppColorsLight.textPrimary),
                 const SizedBox(height: AppSpacing.md),
-
-                // Summary
                 _PreviewSection(
                   heading: 'PROFESSIONAL SUMMARY',
                   content: resume.summary,
                 ),
                 const SizedBox(height: AppSpacing.md),
-
-                // Dynamic sections
                 ...resume.sections.map((s) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: _PreviewSection(
-                      heading: s.heading, content: s.content),
-                )),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: _PreviewSection(
+                          heading: s.heading, content: s.content),
+                    )),
               ],
             ),
           ),
@@ -558,14 +587,14 @@ class _ResumePreview extends StatelessWidget {
 
         const SizedBox(height: AppSpacing.lg),
 
-        // Copy raw text button
+        // Copy raw text button — this IS app chrome, so it follows the theme.
         AppCard(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Row(
               children: [
-                const Icon(Icons.text_snippet_rounded,
-                    color: AppColors.primary, size: 20),
+                Icon(Icons.text_snippet_rounded,
+                    color: Theme.of(context).colorScheme.primary, size: 20),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
@@ -575,11 +604,9 @@ class _ResumePreview extends StatelessWidget {
                 ),
                 OutlinedButton.icon(
                   onPressed: () {
-                    Clipboard.setData(
-                        ClipboardData(text: resume.rawText));
+                    Clipboard.setData(ClipboardData(text: resume.rawText));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Copied to clipboard!')),
+                      const SnackBar(content: Text('Copied to clipboard!')),
                     );
                   },
                   icon: const Icon(Icons.copy_rounded, size: 16),
@@ -608,20 +635,20 @@ class _PreviewSection extends StatelessWidget {
         Text(
           heading,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.8,
-            color: AppColors.textPrimary,
-          ),
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+                color: AppColorsLight.textPrimary,
+              ),
         ),
         const SizedBox(height: 3),
-        const Divider(color: AppColors.borderStrong, height: 1),
+        const Divider(color: AppColorsLight.borderStrong, height: 1),
         const SizedBox(height: 6),
         Text(
           content,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textSecondary,
-            height: 1.5,
-          ),
+                color: AppColorsLight.textSecondary,
+                height: 1.5,
+              ),
         ),
       ],
     );

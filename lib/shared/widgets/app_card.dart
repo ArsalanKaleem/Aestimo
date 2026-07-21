@@ -28,6 +28,10 @@ class _AppCardState extends State<AppCard> {
   @override
   Widget build(BuildContext context) {
     final interactive = widget.onTap != null;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
 
     return MouseRegion(
       cursor: interactive ? SystemMouseCursors.click : MouseCursor.defer,
@@ -41,12 +45,14 @@ class _AppCardState extends State<AppCard> {
           transform: Matrix4.translationValues(0, _hovering ? -3 : 0, 0),
           padding: widget.padding,
           decoration: BoxDecoration(
-            color: widget.color ?? AppColors.surface,
+            color: widget.color ?? surface,
             borderRadius: BorderRadius.circular(AppRadii.lg),
             border: Border.all(
-              color: _hovering ? AppColors.primaryLight : AppColors.border,
+              color: _hovering ? AppColors.primaryLight : border,
             ),
-            boxShadow: _hovering ? AppShadows.raised : AppShadows.card,
+            boxShadow: _hovering
+                ? AppShadows.raised(context)
+                : AppShadows.card(context),
           ),
           child: widget.child,
         ),
@@ -74,7 +80,18 @@ class FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final primary = theme.colorScheme.primary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primarySurface =
+        isDark ? AppColorsDark.primarySurface : AppColorsLight.primarySurface;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+
     return AppCard(
       onTap: onTap,
       child: Column(
@@ -86,10 +103,10 @@ class FeatureCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
+                  color: primarySoft,
                   borderRadius: BorderRadius.circular(AppRadii.md),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 22),
+                child: Icon(icon, color: primary, size: 22),
               ),
               const Spacer(),
               if (badge != null)
@@ -97,20 +114,20 @@ class FeatureCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.primarySurface,
+                    color: primarySurface,
                     borderRadius: BorderRadius.circular(AppRadii.pill),
                   ),
                   child: Text(
                     badge!,
                     style: t.bodySmall?.copyWith(
-                      color: AppColors.primaryDarker,
+                      color: primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 )
               else
-                const Icon(Icons.arrow_outward_rounded,
-                    color: AppColors.textTertiary, size: 20),
+                Icon(Icons.arrow_outward_rounded,
+                    color: textTertiary, size: 20),
             ],
           ),
           const SizedBox(height: AppSpacing.md),

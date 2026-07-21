@@ -19,13 +19,21 @@ class _SourcesPanelState extends State<SourcesPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primarySurface =
+        isDark ? AppColorsDark.primarySurface : AppColorsLight.primarySurface;
+    final primary = theme.colorScheme.primary;
+
     return Container(
       constraints: const BoxConstraints(maxWidth: 640),
       decoration: BoxDecoration(
-        color: AppColors.primarySoft.withValues(alpha: 0.55),
+        color: primarySoft.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(AppRadii.md),
-        border: Border.all(color: AppColors.primarySurface),
+        border: Border.all(color: primarySurface),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,17 +42,15 @@ class _SourcesPanelState extends State<SourcesPanel> {
             borderRadius: BorderRadius.circular(AppRadii.md),
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                  const Icon(Icons.travel_explore_rounded,
-                      size: 17, color: AppColors.primary),
+                  Icon(Icons.travel_explore_rounded, size: 17, color: primary),
                   const SizedBox(width: 8),
                   Text(
                     'Sources · ${widget.sources.length} resume sections',
                     style: t.bodySmall?.copyWith(
-                      color: AppColors.primaryDarker,
+                      color: primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -52,8 +58,8 @@ class _SourcesPanelState extends State<SourcesPanel> {
                   AnimatedRotation(
                     turns: _expanded ? 0.5 : 0,
                     duration: AppDurations.fast,
-                    child: const Icon(Icons.expand_more_rounded,
-                        size: 18, color: AppColors.primary),
+                    child: Icon(Icons.expand_more_rounded,
+                        size: 18, color: primary),
                   ),
                 ],
               ),
@@ -86,14 +92,26 @@ class _SourceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: surface,
         borderRadius: BorderRadius.circular(AppRadii.sm),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,20 +121,18 @@ class _SourceTile extends StatelessWidget {
               Expanded(
                 child: Text(snippet.section,
                     style: t.bodySmall?.copyWith(
-                        color: AppColors.primaryDarker,
-                        fontWeight: FontWeight.w600)),
+                        color: primary, fontWeight: FontWeight.w600)),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
+                  color: primarySoft,
                   borderRadius: BorderRadius.circular(AppRadii.pill),
                 ),
                 child: Text(
                   '${(snippet.score * 100).round()}% match',
                   style: t.bodySmall?.copyWith(
-                    color: AppColors.primary,
+                    color: primary,
                     fontWeight: FontWeight.w600,
                     fontSize: 11,
                   ),
@@ -126,20 +142,20 @@ class _SourceTile extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text('“${snippet.text}”',
-              style: t.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary, height: 1.45)),
+              style:
+                  t.bodyMedium?.copyWith(color: textSecondary, height: 1.45)),
           if (snippet.reason != null) ...[
             const SizedBox(height: 6),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.lightbulb_outline_rounded,
-                    size: 13, color: AppColors.textTertiary),
+                Icon(Icons.lightbulb_outline_rounded,
+                    size: 13, color: textTertiary),
                 const SizedBox(width: 5),
                 Expanded(
                   child: Text(snippet.reason!,
-                      style: t.bodySmall
-                          ?.copyWith(fontStyle: FontStyle.italic)),
+                      style:
+                          t.bodySmall?.copyWith(fontStyle: FontStyle.italic)),
                 ),
               ],
             ),

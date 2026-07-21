@@ -27,8 +27,13 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: ResponsiveContainer(
         maxWidth: 920,
         padding: EdgeInsets.symmetric(
@@ -49,10 +54,7 @@ class AboutScreen extends StatelessWidget {
               child: Text(
                 'Made with Flutter · © ${DateTime.now().year} '
                 '${DeveloperProfile.name}',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: AppColors.textTertiary),
+                style: theme.textTheme.bodySmall?.copyWith(color: textTertiary),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -66,6 +68,10 @@ class AboutScreen extends StatelessWidget {
 
 // ───────────────────────────────────────────────────────────────────────────
 //  Hero
+//  NOTE: everything inside the hero sits on top of AppColors.brandGradient,
+//  a fixed brand surface. AppColors.secondary (white) and its opacity
+//  variants are correct in both themes here — this section intentionally
+//  does NOT change with brightness.
 // ───────────────────────────────────────────────────────────────────────────
 
 class _Hero extends StatelessWidget {
@@ -78,7 +84,7 @@ class _Hero extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: AppColors.brandGradient,
         borderRadius: BorderRadius.circular(AppRadii.xl),
-        boxShadow: AppShadows.raised,
+        boxShadow: AppShadows.raised(context),
       ),
       child: Stack(
         children: [
@@ -100,9 +106,7 @@ class _Hero extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, c) {
                 final wide = c.maxWidth > 540;
-                return wide
-                    ? _wideHero(context)
-                    : _narrowHero(context);
+                return wide ? _wideHero(context) : _narrowHero(context);
               },
             ),
           ),
@@ -161,8 +165,8 @@ class _Hero extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md, vertical: 6),
           decoration: BoxDecoration(
             color: AppColors.secondary.withValues(alpha: 0.16),
             borderRadius: BorderRadius.circular(AppRadii.pill),
@@ -190,8 +194,7 @@ class _Hero extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.location_on_rounded,
-                  size: 15,
-                  color: AppColors.secondary.withValues(alpha: 0.8)),
+                  size: 15, color: AppColors.secondary.withValues(alpha: 0.8)),
               const SizedBox(width: 4),
               Text(
                 DeveloperProfile.location,
@@ -230,8 +233,7 @@ class _SocialRow extends StatelessWidget {
                 onTap: () => onOpen(link.url),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Icon(link.icon,
-                      size: 20, color: AppColors.secondary),
+                  child: Icon(link.icon, size: 20, color: AppColors.secondary),
                 ),
               ),
             ),
@@ -243,7 +245,8 @@ class _SocialRow extends StatelessWidget {
 
 /// Circular developer picture with a white ring — network photo when set,
 /// otherwise initials. Shows a spinner while loading and falls back to
-/// initials if the image fails.
+/// initials if the image fails. Fixed white/brand styling — sits on the
+/// gradient hero, so it does not change with theme.
 class _DeveloperAvatar extends StatelessWidget {
   const _DeveloperAvatar({required this.radius});
   final double radius;
@@ -323,7 +326,15 @@ class _BioCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final primarySurface =
+        isDark ? AppColorsDark.primarySurface : AppColorsLight.primarySurface;
+    final primary = theme.colorScheme.primary;
+
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +344,7 @@ class _BioCard extends StatelessWidget {
           Text(
             DeveloperProfile.bio,
             style: t.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: textSecondary,
               height: 1.6,
             ),
           ),
@@ -347,16 +358,16 @@ class _BioCard extends StatelessWidget {
               children: [
                 for (final area in DeveloperProfile.focusAreas)
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 7),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                     decoration: BoxDecoration(
-                      color: AppColors.primarySurface,
+                      color: primarySurface,
                       borderRadius: BorderRadius.circular(AppRadii.pill),
                     ),
                     child: Text(
                       area,
-                      style: const TextStyle(
-                        color: AppColors.primaryDarker,
+                      style: TextStyle(
+                        color: primary,
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
                       ),
@@ -419,8 +430,20 @@ class _LinkButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final textPrimary =
+        isDark ? AppColorsDark.textPrimary : AppColorsLight.textPrimary;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
+
     return Material(
-      color: AppColors.surface,
+      color: surface,
       borderRadius: BorderRadius.circular(AppRadii.md),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadii.md),
@@ -432,7 +455,7 @@ class _LinkButton extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadii.md),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: border),
           ),
           child: Row(
             children: [
@@ -440,24 +463,23 @@ class _LinkButton extends StatelessWidget {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
+                  color: primarySoft,
                   borderRadius: BorderRadius.circular(AppRadii.sm),
                 ),
-                child: Icon(link.icon, size: 18, color: AppColors.primary),
+                child: Icon(link.icon, size: 18, color: primary),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   link.label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: textPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Icon(Icons.north_east_rounded,
-                  size: 16, color: AppColors.textTertiary),
+              Icon(Icons.north_east_rounded, size: 16, color: textTertiary),
             ],
           ),
         ),
@@ -474,21 +496,41 @@ class _AboutAppCard extends StatelessWidget {
   const _AboutAppCard();
 
   static const _features = [
-    (Icons.insights_rounded, 'Resume Insights',
-        'Skills, experience, strengths & gaps at a glance.'),
-    (Icons.forum_rounded, 'AI Chat',
-        'Ask anything about your career — answers cite your resume.'),
-    (Icons.psychology_rounded, 'Interview Prep',
-        'Personalized questions and live mock interviews.'),
-    (Icons.mail_rounded, 'Cover Letters',
-        'Tailored letters generated from your background.'),
+    (
+      Icons.insights_rounded,
+      'Resume Insights',
+      'Skills, experience, strengths & gaps at a glance.'
+    ),
+    (
+      Icons.forum_rounded,
+      'AI Chat',
+      'Ask anything about your career — answers cite your resume.'
+    ),
+    (
+      Icons.psychology_rounded,
+      'Interview Prep',
+      'Personalized questions and live mock interviews.'
+    ),
+    (
+      Icons.mail_rounded,
+      'Cover Letters',
+      'Tailored letters generated from your background.'
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final primary = theme.colorScheme.primary;
+
     return AppCard(
-      color: AppColors.primarySoft,
+      color: primarySoft,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -512,7 +554,7 @@ class _AboutAppCard extends StatelessWidget {
           Text(
             AppConstants.tagline,
             style: t.bodyLarge?.copyWith(
-              color: AppColors.primaryDarker,
+              color: primary,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -521,7 +563,7 @@ class _AboutAppCard extends StatelessWidget {
             '${AppConstants.appName} reads your resume and turns it into a '
             'personal career copilot — grounded in your real experience.',
             style: t.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: textSecondary,
               height: 1.5,
             ),
           ),
@@ -554,7 +596,14 @@ class _FeatureRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final primary = theme.colorScheme.primary;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -562,10 +611,10 @@ class _FeatureRow extends StatelessWidget {
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: surface,
             borderRadius: BorderRadius.circular(AppRadii.sm),
           ),
-          child: Icon(icon, size: 19, color: AppColors.primary),
+          child: Icon(icon, size: 19, color: primary),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
@@ -577,7 +626,7 @@ class _FeatureRow extends StatelessWidget {
               Text(
                 subtitle,
                 style: t.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -595,10 +644,14 @@ class _MiniLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+
     return Text(
       text.toUpperCase(),
-      style: const TextStyle(
-        color: AppColors.textTertiary,
+      style: TextStyle(
+        color: textTertiary,
         fontWeight: FontWeight.w700,
         fontSize: 11,
         letterSpacing: 0.6,

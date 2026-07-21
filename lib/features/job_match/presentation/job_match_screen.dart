@@ -46,6 +46,14 @@ class _JobMatchScreenState extends ConsumerState<JobMatchScreen> {
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(jobMatchProvider);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
 
     return Scaffold(
       body: ResponsiveContainer(
@@ -69,7 +77,7 @@ class _JobMatchScreenState extends ConsumerState<JobMatchScreen> {
               onSubmitted: _runSearch,
               suffix: IconButton(
                 icon: const Icon(Icons.arrow_forward_rounded, size: 20),
-                color: AppColors.primary,
+                color: primary,
                 onPressed: () => _runSearch(_search.text),
               ),
             ),
@@ -80,10 +88,10 @@ class _JobMatchScreenState extends ConsumerState<JobMatchScreen> {
                 for (final chip in _quickChips)
                   ActionChip(
                     label: Text(chip),
-                    backgroundColor: AppColors.surfaceMuted,
-                    side: const BorderSide(color: AppColors.border),
-                    labelStyle: const TextStyle(
-                      color: AppColors.textSecondary,
+                    backgroundColor: surfaceMuted,
+                    side: BorderSide(color: border),
+                    labelStyle: TextStyle(
+                      color: textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                     onPressed: () {
@@ -104,8 +112,7 @@ class _JobMatchScreenState extends ConsumerState<JobMatchScreen> {
                     return EmptyState(
                       icon: Icons.work_outline_rounded,
                       title: 'Upload a resume to match jobs',
-                      message:
-                          'We rank live job listings against your resume. '
+                      message: 'We rank live job listings against your resume. '
                           'Upload one to get personalized matches.',
                       actionLabel: 'Upload resume',
                       onAction: () => context.go(AppRoutes.upload),
@@ -164,7 +171,12 @@ class _JobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
     final job = match.job;
 
     return AppCard(
@@ -212,20 +224,17 @@ class _JobCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: AppColors.primarySoft,
+                color: primarySoft,
                 borderRadius: BorderRadius.circular(AppRadii.sm),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.auto_awesome_rounded,
-                      size: 15, color: AppColors.primary),
+                  Icon(Icons.auto_awesome_rounded, size: 15, color: primary),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(match.reason,
-                        style: t.bodySmall?.copyWith(
-                          color: AppColors.primaryDarker,
-                        )),
+                        style: t.bodySmall?.copyWith(color: primary)),
                   ),
                 ],
               ),
@@ -253,19 +262,25 @@ class _Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final primary = theme.colorScheme.primary;
     final initial =
         company.trim().isNotEmpty ? company.trim()[0].toUpperCase() : '?';
+
     Widget fallback() => Container(
           width: 44,
           height: 44,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: AppColors.primarySoft,
+            color: primarySoft,
             borderRadius: BorderRadius.circular(AppRadii.sm),
           ),
           child: Text(initial,
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: primary,
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
               )),
@@ -291,11 +306,18 @@ class _ScoreBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final success = isDark ? AppColors.successDark : AppColors.success;
+    final warning = isDark ? AppColors.warningDark : AppColors.warning;
+    final primary = theme.colorScheme.primary;
+
     final Color c = score >= 75
-        ? AppColors.success
+        ? success
         : score >= 50
-            ? AppColors.primary
-            : AppColors.warning;
+            ? primary
+            : warning;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -329,16 +351,26 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primarySurface =
+        isDark ? AppColorsDark.primarySurface : AppColorsLight.primarySurface;
+    final surfaceMuted =
+        isDark ? AppColorsDark.surfaceMuted : AppColorsLight.surfaceMuted;
+    final primary = theme.colorScheme.primary;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: highlight ? AppColors.primarySurface : AppColors.surfaceMuted,
+        color: highlight ? primarySurface : surfaceMuted,
         borderRadius: BorderRadius.circular(AppRadii.pill),
       ),
       child: Text(
         text,
         style: TextStyle(
-          color: highlight ? AppColors.primaryDarker : AppColors.textSecondary,
+          color: highlight ? primary : textSecondary,
           fontWeight: FontWeight.w500,
           fontSize: 12,
         ),

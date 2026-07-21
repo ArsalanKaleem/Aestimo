@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/router/app_routes.dart';
 import '../../../core/settings/settings_providers.dart';
+import '../../../core/settings/theme_mode_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
@@ -74,7 +75,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     // Watch the value so the labels/buttons update after a save.
     ref.watch(geminiApiKeyProvider);
     final isCustom = ref.read(geminiApiKeyProvider.notifier).isCustom;
-    final t = Theme.of(context).textTheme;
+
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+    final success = isDark ? AppColors.successDark : AppColors.success;
 
     return Scaffold(
       body: ResponsiveContainer(
@@ -89,11 +101,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   IconButton(
                     onPressed: () => context.go(AppRoutes.dashboard),
                     icon: const Icon(Icons.arrow_back_rounded),
-                    color: AppColors.textSecondary,
+                    color: textSecondary,
                   ),
                 Text('Settings', style: t.titleLarge),
               ],
             ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // ── Appearance ────────────────────────────────────────────────
+            Text('Appearance', style: t.titleMedium),
+            const SizedBox(height: AppSpacing.sm),
+            const _ThemeModeCard(),
             const SizedBox(height: AppSpacing.lg),
 
             // ── API key ───────────────────────────────────────────────────
@@ -107,11 +125,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         width: 38,
                         height: 38,
                         decoration: BoxDecoration(
-                          color: AppColors.primarySoft,
+                          color: primarySoft,
                           borderRadius: BorderRadius.circular(AppRadii.md),
                         ),
-                        child: const Icon(Icons.key_rounded,
-                            color: AppColors.primary, size: 19),
+                        child:
+                            Icon(Icons.key_rounded, color: primary, size: 19),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
@@ -124,9 +142,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   ? 'Using your own key'
                                   : 'Using the built-in key',
                               style: t.bodySmall?.copyWith(
-                                color: isCustom
-                                    ? AppColors.success
-                                    : AppColors.textTertiary,
+                                color: isCustom ? success : textTertiary,
                               ),
                             ),
                           ],
@@ -138,9 +154,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Text(
                     'Use your own Google Gemini API key to avoid shared rate '
                     'limits. It is stored only on this device.',
-                    style: t.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                    style: t.bodyMedium?.copyWith(color: textSecondary),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   AppTextField(
@@ -155,12 +169,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       children: [
                         IconButton(
                           tooltip: 'Paste',
-                          icon: const Icon(Icons.content_paste_rounded,
-                              size: 18),
-                          color: AppColors.textTertiary,
+                          icon:
+                              const Icon(Icons.content_paste_rounded, size: 18),
+                          color: textTertiary,
                           onPressed: () async {
-                            final data =
-                                await Clipboard.getData('text/plain');
+                            final data = await Clipboard.getData('text/plain');
                             if (data?.text != null) {
                               _controller.text = data!.text!.trim();
                             }
@@ -174,9 +187,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 : Icons.visibility_off_rounded,
                             size: 18,
                           ),
-                          color: AppColors.textTertiary,
-                          onPressed: () =>
-                              setState(() => _obscure = !_obscure),
+                          color: textTertiary,
+                          onPressed: () => setState(() => _obscure = !_obscure),
                         ),
                       ],
                     ),
@@ -217,14 +229,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: const [
                   _Step(
                     n: 1,
-                    text:
-                        'Open Google AI Studio and sign in with your Google '
+                    text: 'Open Google AI Studio and sign in with your Google '
                         'account.',
                   ),
                   _Step(
                     n: 2,
-                    text:
-                        'Click “Create API key”. You can create one in a new '
+                    text: 'Click “Create API key”. You can create one in a new '
                         'project or an existing one.',
                   ),
                   _Step(
@@ -233,8 +243,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   _Step(
                     n: 4,
-                    text:
-                        'Paste it in the field above and tap Save. The free '
+                    text: 'Paste it in the field above and tap Save. The free '
                         'tier needs no credit card.',
                     last: true,
                   ),
@@ -253,6 +262,154 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const SizedBox(height: AppSpacing.lg),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Lets the user pick Light / Dark / System. Persists via [themeModeProvider].
+class _ThemeModeCard extends ConsumerWidget {
+  const _ThemeModeCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(themeModeProvider);
+    final theme = Theme.of(context);
+    final t = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: primarySoft,
+                  borderRadius: BorderRadius.circular(AppRadii.md),
+                ),
+                child: Icon(Icons.dark_mode_rounded, color: primary, size: 19),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Theme', style: t.titleMedium),
+                    Text(
+                      'Choose how Aestimo looks on this device.',
+                      style: t.bodySmall?.copyWith(color: textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _ModeChip(
+                  label: 'Light',
+                  icon: Icons.light_mode_rounded,
+                  selected: mode == ThemeMode.light,
+                  onTap: () => ref
+                      .read(themeModeProvider.notifier)
+                      .setThemeMode(ThemeMode.light),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: _ModeChip(
+                  label: 'Dark',
+                  icon: Icons.dark_mode_rounded,
+                  selected: mode == ThemeMode.dark,
+                  onTap: () => ref
+                      .read(themeModeProvider.notifier)
+                      .setThemeMode(ThemeMode.dark),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: _ModeChip(
+                  label: 'System',
+                  icon: Icons.settings_suggest_rounded,
+                  selected: mode == ThemeMode.system,
+                  onTap: () => ref
+                      .read(themeModeProvider.notifier)
+                      .setThemeMode(ThemeMode.system),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ModeChip extends StatelessWidget {
+  const _ModeChip({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
+    return Material(
+      color: selected ? primarySoft : Colors.transparent,
+      borderRadius: BorderRadius.circular(AppRadii.md),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.md),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadii.md),
+            border: Border.all(
+              color: selected ? primary : border,
+              width: selected ? 1.4 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, size: 20, color: selected ? primary : textSecondary),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: selected ? primary : textSecondary,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

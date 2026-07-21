@@ -65,6 +65,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final auth = ref.watch(authProvider);
     final isRegister = _mode == _Mode.register;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surface = isDark ? AppColorsDark.surface : AppColorsLight.surface;
+    final border = isDark ? AppColorsDark.border : AppColorsLight.border;
+    final textTertiary =
+        isDark ? AppColorsDark.textTertiary : AppColorsLight.textTertiary;
+    final primary = theme.colorScheme.primary;
+
     ref.listen(authProvider, (prev, next) {
       if (next.error != null && next.error != prev?.error) {
         ScaffoldMessenger.of(context)
@@ -77,10 +85,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       constraints: const BoxConstraints(maxWidth: 420),
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: surface,
         borderRadius: BorderRadius.circular(AppRadii.xl),
-        border: Border.all(color: AppColors.border),
-        boxShadow: AppShadows.raised,
+        border: Border.all(color: border),
+        boxShadow: AppShadows.raised(context),
       ),
       child: Form(
         key: _formKey,
@@ -92,14 +100,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             const SizedBox(height: AppSpacing.lg),
             Text(
               isRegister ? 'Create your account' : 'Welcome back',
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: theme.textTheme.headlineSmall,
             ),
             const SizedBox(height: 6),
             Text(
               isRegister
                   ? 'Sign up to get started with your AI career copilot.'
                   : 'Sign in to pick up where your career copilot left off.',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: AppSpacing.xl),
 
@@ -147,7 +155,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
                   size: 20,
-                  color: AppColors.textTertiary,
+                  color: textTertiary,
                 ),
                 onPressed: () => setState(() => _obscure = !_obscure),
               ),
@@ -195,14 +203,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             if (!isRegister) ...[
               const SizedBox(height: AppSpacing.md),
               Row(
-                children: const [
-                  Expanded(child: Divider()),
+                children: [
+                  const Expanded(child: Divider()),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('or',
-                        style: TextStyle(color: AppColors.textTertiary)),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text('or', style: TextStyle(color: textTertiary)),
                   ),
-                  Expanded(child: Divider()),
+                  const Expanded(child: Divider()),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
@@ -227,12 +234,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     text: isRegister
                         ? 'Already have an account?  '
                         : "New here?  ",
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: theme.textTheme.bodyMedium,
                     children: [
                       TextSpan(
                         text: isRegister ? 'Sign in' : 'Create an account',
-                        style: const TextStyle(
-                          color: AppColors.primary,
+                        style: TextStyle(
+                          color: primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -249,10 +256,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
+          // Fixed brand gradient banner — sits behind the card, does not
+          // change with theme (matches the drawer header / about hero
+          // convention used elsewhere in the app).
           Container(
             height: context.height * 0.42,
-            decoration:
-                const BoxDecoration(gradient: AppColors.brandGradient),
+            decoration: const BoxDecoration(gradient: AppColors.brandGradient),
           ),
           SafeArea(
             child: Center(
@@ -320,8 +329,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 }
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Password reset email sent.')),
+                    const SnackBar(content: Text('Password reset email sent.')),
                   );
                 }
               } on fb.FirebaseAuthException catch (e) {

@@ -23,12 +23,12 @@ const _navItems = <_NavItem>[
       AppRoutes.upload),
   _NavItem(Icons.insights_outlined, Icons.insights_rounded, 'Insights',
       AppRoutes.insights),
-  _NavItem(Icons.forum_outlined, Icons.forum_rounded, 'AI Chat',
-      AppRoutes.chat),
+  _NavItem(
+      Icons.forum_outlined, Icons.forum_rounded, 'AI Chat', AppRoutes.chat),
   _NavItem(Icons.psychology_outlined, Icons.psychology_rounded, 'Interview',
       AppRoutes.interview),
-  _NavItem(Icons.work_outline_rounded, Icons.work_rounded, 'Jobs',
-      AppRoutes.jobs),
+  _NavItem(
+      Icons.work_outline_rounded, Icons.work_rounded, 'Jobs', AppRoutes.jobs),
   _NavItem(Icons.mail_outline_rounded, Icons.mail_rounded, 'Cover Letter',
       AppRoutes.coverLetter),
   _NavItem(Icons.score_outlined, Icons.score_rounded, 'Resume Score',
@@ -69,21 +69,25 @@ class AppShell extends StatelessWidget {
     final location = GoRouterState.of(context).uri.path;
     final selected = _indexForLocation(location);
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final shadow = isDark ? AppColorsDark.shadow : AppColorsLight.shadow;
+
     if (context.isMobile) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: AppColors.surface,
-          surfaceTintColor: AppColors.surface,
+          backgroundColor: theme.colorScheme.surface,
+          surfaceTintColor: theme.colorScheme.surface,
           elevation: 0,
           scrolledUnderElevation: 0.5,
-          shadowColor: AppColors.shadow,
-          iconTheme: const IconThemeData(color: AppColors.textPrimary),
+          shadowColor: shadow,
+          iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
           titleSpacing: 0,
           title: Text(
             _titleForLocation(location),
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w700,
               fontSize: 18,
             ),
@@ -128,7 +132,7 @@ class _AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       width: 296,
       child: Column(
         children: [
@@ -180,6 +184,9 @@ class _AppDrawer extends StatelessWidget {
   }
 }
 
+/// The gradient banner is brand-fixed (same in both themes), so this widget
+/// needs no dark-mode branching — `AppColors.secondary`/`brandGradient` are
+/// intentionally constant regardless of brightness.
 class _DrawerHeader extends StatelessWidget {
   const _DrawerHeader();
 
@@ -250,16 +257,26 @@ class _DrawerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final primary = theme.colorScheme.primary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+    final dangerColor = isDark ? AppColors.dangerDark : AppColors.danger;
+
     final fg = danger
-        ? AppColors.danger
+        ? dangerColor
         : active
-            ? AppColors.primaryDarker
-            : AppColors.textSecondary;
+            ? primary
+            : textSecondary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Material(
-        color: active ? AppColors.primarySoft : Colors.transparent,
+        color: active ? primarySoft : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadii.md),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadii.md),
@@ -271,7 +288,7 @@ class _DrawerTile extends StatelessWidget {
                 Icon(
                   active ? item.activeIcon : item.icon,
                   size: 22,
-                  color: danger ? AppColors.danger : fg,
+                  color: danger ? dangerColor : fg,
                 ),
                 const SizedBox(width: 14),
                 Text(
@@ -287,8 +304,8 @@ class _DrawerTile extends StatelessWidget {
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
+                    decoration: BoxDecoration(
+                      color: primary,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -312,9 +329,18 @@ class _SideRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final primary = theme.colorScheme.primary;
+    final primarySoft =
+        isDark ? AppColorsDark.primarySoft : AppColorsLight.primarySoft;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return Container(
       width: extended ? 248 : 88,
-      color: AppColors.surface,
+      color: theme.colorScheme.surface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -335,9 +361,7 @@ class _SideRail extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 3),
                   child: Material(
-                    color: isActive
-                        ? AppColors.primarySoft
-                        : Colors.transparent,
+                    color: isActive ? primarySoft : Colors.transparent,
                     borderRadius: BorderRadius.circular(AppRadii.md),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(AppRadii.md),
@@ -355,9 +379,7 @@ class _SideRail extends StatelessWidget {
                             Icon(
                               isActive ? n.activeIcon : n.icon,
                               size: 22,
-                              color: isActive
-                                  ? AppColors.primary
-                                  : AppColors.textSecondary,
+                              color: isActive ? primary : textSecondary,
                             ),
                             if (extended) ...[
                               const SizedBox(width: 12),
@@ -367,9 +389,7 @@ class _SideRail extends StatelessWidget {
                                   fontWeight: isActive
                                       ? FontWeight.w600
                                       : FontWeight.w500,
-                                  color: isActive
-                                      ? AppColors.primaryDarker
-                                      : AppColors.textSecondary,
+                                  color: isActive ? primary : textSecondary,
                                 ),
                               ),
                             ],
@@ -426,6 +446,11 @@ class _RailTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textSecondary =
+        isDark ? AppColorsDark.textSecondary : AppColorsLight.textSecondary;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.sm,
@@ -445,17 +470,16 @@ class _RailTile extends StatelessWidget {
               vertical: 12,
             ),
             child: Row(
-              mainAxisAlignment: extended
-                  ? MainAxisAlignment.start
-                  : MainAxisAlignment.center,
+              mainAxisAlignment:
+                  extended ? MainAxisAlignment.start : MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 20, color: AppColors.textSecondary),
+                Icon(icon, size: 20, color: textSecondary),
                 if (extended) ...[
                   const SizedBox(width: 12),
                   Text(
                     label,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
